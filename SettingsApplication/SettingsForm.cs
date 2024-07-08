@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Windows.Forms;
 using Util;
 
@@ -7,8 +6,16 @@ namespace SettingsApplication
 {
     public partial class SettingsForm : Form
     {
-        public SettingsForm()
+        private readonly ISettingsLoader _settingsLoader;
+        private readonly ISettingsSaver _settingsSaver;
+        private readonly IConfigUpdater _configUpdater;
+
+        public SettingsForm(ISettingsLoader settingsLoader, ISettingsSaver settingsSaver, IConfigUpdater configUpdater)
         {
+            _settingsLoader = settingsLoader;
+            _settingsSaver = settingsSaver;
+            _configUpdater = configUpdater;
+
             InitializeComponent();
 
             comboBoxService.Items.AddRange(new object[] { "FileWatcherService", "LogoMockWebApi" });
@@ -27,34 +34,50 @@ namespace SettingsApplication
 
         private void LoadSettings(string serviceName)
         {
-            var settings = JsonHelper.LoadServiceSettings(serviceName);
-
-            if (settings != null)//null olma durumunda log
+            try
             {
-                textBoxTimeInterval.Text = settings.MonitorInterval?.ToString();
-                textBoxNumberOfRuns.Text = settings.NumberOfRuns?.ToString();
-                comboBoxLogLevel.SelectedItem = settings.LogLevel?.ToString();
+                var jsonObject = JsonHelper.LoadServiceSettings(serviceName);
 
-                if (serviceName.Contains("Service"))//methodlara bölünebilir.
+                if (jsonObject != null)
                 {
-                    labelFolderPath.Visible = true;
-                    textBoxFolderPath.Visible = true;
-                    btnFolderPath.Visible = true;
-                    labelUrl.Visible = false;
-                    textBoxUrl.Visible = false;
+                    var settings = jsonObject.ToObject<ServiceSettings>(); 
 
-                    textBoxFolderPath.Text = settings.FolderPath?.ToString();
-                }
-                else if (serviceName.Contains("WebApi"))
-                {
-                    labelFolderPath.Visible = serviceName.Contains("Service");
-                    textBoxFolderPath.Visible = false;
-                    btnFolderPath.Visible = false;
-                    labelUrl.Visible = serviceName.Contains("WebApi");
-                    textBoxUrl.Visible = true;
+                    textBoxTimeInterval.Text = settings.MonitorInterval?.ToString();
+                    textBoxNumberOfRuns.Text = settings.NumberOfRuns?.ToString();
+                    comboBoxLogLevel.SelectedItem = settings.LogLevel;
 
-                    textBoxUrl.Text = settings.Url?.ToString();
+                    UpdateVisibility(serviceName);
+                    UpdateFields(serviceName, settings);
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while loading settings: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private void UpdateVisibility(string serviceName)
+        {
+            bool isService = serviceName.Contains("Service");
+            bool isWebApi = serviceName.Contains("WebApi");
+
+            labelFolderPath.Visible = isService;
+            textBoxFolderPath.Visible = isService;
+            btnFolderPath.Visible = isService;
+            labelUrl.Visible = isWebApi;
+            textBoxUrl.Visible = isWebApi;
+        }
+
+        private void UpdateFields(string serviceName, ServiceSettings settings)
+        {
+            if (serviceName.Contains("Service"))
+            {
+                textBoxFolderPath.Text = settings.FolderPath?.ToString();
+            }
+            else if (serviceName.Contains("WebApi"))
+            {
+                textBoxUrl.Text = settings.Url?.ToString();
             }
         }
 
@@ -62,7 +85,7 @@ namespace SettingsApplication
         {
             var serviceName = comboBoxService.Text;
 
-            if (string.IsNullOrEmpty(serviceName)) // null or empty
+            if (string.IsNullOrEmpty(serviceName))
             {
                 MessageBox.Show("Please select a service name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -87,12 +110,12 @@ namespace SettingsApplication
 
             try
             {
-                JsonHelper.SaveServiceSettings(serviceName, serviceSettings);
+                _settingsSaver.SaveSettings(serviceName, serviceSettings);
 
                 if (serviceName.Contains("Service"))
                 {
                     string appConfigPath = $@"C:\Users\Emre.Evcin\source\repos\ManagementService\{serviceName}\App.config";
-                    UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, serviceSettings.FolderPath, appConfigPath);
+                    _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, serviceSettings.FolderPath, appConfigPath);
                 }
 
                 MessageBox.Show("Settings saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -103,8 +126,6 @@ namespace SettingsApplication
             }
         }
 
-
-
         private void BtnFolderPath_Click(object sender, EventArgs e)
         {
             using (var folderBrowserDialog = new FolderBrowserDialog())
@@ -113,43 +134,6 @@ namespace SettingsApplication
                 {
                     textBoxFolderPath.Text = folderBrowserDialog.SelectedPath;
                 }
-            }
-        }
-
-        private void UpdateAppConfigLogLevel(string serviceName, string logLevel, string folderPath, string appConfigPath)
-        {
-            try
-            {
-                var map = new ExeConfigurationFileMap { ExeConfigFilename = appConfigPath };
-                var config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
-
-                string logLevelKey = "serilog:minimum-level";
-                string pathKey = "Path";
-
-                if (config.AppSettings.Settings[logLevelKey] != null)
-                {
-                    config.AppSettings.Settings[logLevelKey].Value = logLevel;
-                }
-                else
-                {
-                    config.AppSettings.Settings.Add(logLevelKey, logLevel);
-                }
-
-                if (config.AppSettings.Settings[pathKey] != null)
-                {
-                    config.AppSettings.Settings[pathKey].Value = folderPath;
-                }
-                else
-                {
-                    config.AppSettings.Settings.Add(pathKey, folderPath);
-                }
-
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");//const
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while updating App.config: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

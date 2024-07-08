@@ -94,7 +94,27 @@ namespace Util
             }
         }
 
-
+        public static string GetServicePath(string serviceName)
+        {
+            try
+            {
+                dynamic allSettings = LoadAllSettings();
+                if (allSettings != null)
+                {
+                    if (allSettings.ContainsKey("Services") && allSettings["Services"][serviceName] != null)
+                    {
+                        var serviceSettings = allSettings["Services"][serviceName];
+                        string path = serviceSettings["FolderPath"];
+                        return path;
+                    }
+                }
+                return null; // If service or path not found, return null
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving service path: {ex.Message}");
+            }
+        }
 
         private static dynamic LoadAllSettings()
         {

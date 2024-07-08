@@ -15,7 +15,7 @@ namespace LogoMockWebApi
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(CheckIISAndOpenBrowser, null, TimeSpan.Zero, TimeSpan.FromSeconds(2));
+            _timer = new Timer(CheckIISAndOpenBrowser, null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
             return Task.CompletedTask;
         }
 
@@ -23,7 +23,7 @@ namespace LogoMockWebApi
         {
             if (IsIISRunning())
             {
-                OpenBrowser("http://localhost:88/api/Ping/ping");
+                OpenBrowser("http://localhost:88/api/");
             }
         }
 

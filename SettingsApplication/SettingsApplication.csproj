@@ -131,6 +131,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppConfigUpdater.cs" />
+    <Compile Include="IConfigUpdater.cs" />
+    <Compile Include="ISettingsLoader.cs" />
+    <Compile Include="ISettingsSaver.cs" />
+    <Compile Include="JsonSettingsLoader.cs" />
+    <Compile Include="JsonSettingsSaver.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>

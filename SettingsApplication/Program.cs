@@ -16,7 +16,12 @@ namespace SettingsApplication
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SettingsForm());
+
+            var settingsLoader = new JsonSettingsLoader();
+            var settingsSaver = new JsonSettingsSaver();
+            var configUpdater = new AppConfigUpdater();
+
+            Application.Run(new SettingsForm(settingsLoader, settingsSaver, configUpdater));
         }
     }
 }
