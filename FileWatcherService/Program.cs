@@ -33,7 +33,7 @@ namespace FileWatcherService
         private static ILogger ConfigureLogger()
         {
             string logLevelString = LogLevel.GetLogLevel(serviceName);
-            LogEventLevel logLevel = LogLevel.ConvertToLogEventLevel(logLevelString);//quick watch ve stringi nasıl geliyor ona bakılacak.
+            LogEventLevel logLevel = LogLevel.ConvertToLogEventLevel(logLevelString);//quick watch ve stringi nasıl geliyor ona bakılacak.   ("Info")
 
             return new LoggerConfiguration().ReadFrom.AppSettings().MinimumLevel.Is(logLevel).Enrich.FromLogContext().CreateLogger();
         }

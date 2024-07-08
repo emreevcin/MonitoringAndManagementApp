@@ -11,13 +11,15 @@ namespace MonitoringService
     public partial class MonitoringService : ServiceBase
     {
         private readonly ILogger _logCatcher;
-        private readonly Dictionary<string, Dictionary<string, ServiceSettings>> _servicesToMonitor;
+        private readonly IServiceSettingsLoader _serviceSettingsLoader;
+        private readonly Dictionary<string, IServiceMonitor> _serviceMonitors;
 
-        public MonitoringService(ILogger logCatcher)
+        public MonitoringService(ILogger logCatcher, IServiceSettingsLoader serviceSettingsLoader, Dictionary<string, IServiceMonitor> serviceMonitors)
         {
             InitializeComponent();
-            _servicesToMonitor = LoadServiceSettings();
             _logCatcher = logCatcher;
+            _serviceSettingsLoader = serviceSettingsLoader;
+            _serviceMonitors = serviceMonitors;
         }
 
         protected override void OnStart(string[] args)
@@ -33,153 +35,35 @@ namespace MonitoringService
 
         private void StartMonitoring()
         {
-            foreach (var categoryEntry in _servicesToMonitor)
+            var servicesToMonitor = _serviceSettingsLoader.LoadServiceSettings();
+
+            foreach (var categoryEntry in servicesToMonitor)
             {
                 string categoryName = categoryEntry.Key;
                 var servicesInCategory = categoryEntry.Value;
+
+                if (!_serviceMonitors.ContainsKey(categoryName))
+                {
+                    _logCatcher.Warning($"Unknown category '{categoryName}' encountered. No monitoring action taken for services in this category.");
+                    continue;
+                }
+
+                var serviceMonitor = _serviceMonitors[categoryName];
 
                 foreach (var serviceEntry in servicesInCategory)
                 {
                     string serviceName = serviceEntry.Key;
                     ServiceSettings settings = serviceEntry.Value;
 
-                    Timer timer = new Timer();
-
-                    if (categoryName == "Services")
+                    Timer timer = new Timer
                     {
-                        timer.Elapsed += (sender, e) => MonitorService(serviceName, settings);
-                    }
-                    else if (categoryName == "WebApis")
-                    {
-                        timer.Elapsed += (sender, e) => MonitorIISApplication(serviceName, settings);
-                    }
-                    else
-                    {
-                        _logCatcher.Warning($"Unknown category '{categoryName}' encountered. No monitoring action taken for service '{serviceName}'.");
-                        continue;
-                    }
-
-                    timer.Interval = settings.MonitorInterval * 1000; // Convert seconds to milliseconds
-                    timer.Enabled = true;
+                        Interval = settings.MonitorInterval * 1000,
+                        Enabled = true
+                    };
+                    timer.Elapsed += (sender, e) => serviceMonitor.MonitorService(serviceName, settings);
                     timer.Start();
                 }
             }
         }
-
-    private void MonitorIISApplication(string applicationName, ServiceSettings settings)
-        {
-            try
-            {
-                using (var serverManager = new ServerManager())
-                {
-                    ApplicationPool appPool = serverManager.ApplicationPools[applicationName];
-
-                    if (appPool != null)
-                    {
-                        if (appPool.State == ObjectState.Stopped)
-                        {
-                            _logCatcher.Warning($"{settings.ServiceName} downed. Attempting to restart.");
-
-                            if (settings.NumberOfRuns > 0)
-                            {
-                                appPool.Start();
-                                settings.NumberOfRuns--;
-
-                                if (appPool.State == ObjectState.Started)
-                                {
-                                    _logCatcher.Information($"{settings.ServiceName} started.");
-                                }
-                                else
-                                {
-                                    _logCatcher.Error($"{settings.ServiceName} failed to run.");
-                                }
-                            }
-                            else
-                            {
-                                _logCatcher.Error($"{settings.ServiceName} downed. Maximum restart attempts exceeded.");
-                            }
-                        }
-                        else
-                        {
-                            _logCatcher.Information($"{settings.ServiceName} is working.");
-                        }
-                    }
-                }
-
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logCatcher.Error($"Invalid operation when checking {settings.ServiceName}: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                _logCatcher.Error($"Error checking {settings.ServiceName}: {ex.Message}");
-            }
-        }
-
-        private void MonitorService(string serviceName, ServiceSettings settings)
-        {
-            try
-            {
-                ServiceController service = new ServiceController(serviceName);
-
-                if (service.Status == ServiceControllerStatus.Stopped)
-                {
-                    _logCatcher.Warning($"{settings.ServiceName} downed. Attempting to restart.");
-
-                    if (settings.NumberOfRuns > 0)
-                    {
-                        service.Start();
-                        settings.NumberOfRuns--;
-
-                        int waitTime = Math.Min(settings.MonitorInterval * 200, 2000); // Cap the wait time at 2000 ms (2 seconds)
-                        service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(waitTime));
-
-
-                        if (service.Status == ServiceControllerStatus.Running)
-                        {
-                            _logCatcher.Information($"{settings.ServiceName} started.");
-                        }
-                        else
-                        {
-                            _logCatcher.Error($"{settings.ServiceName} failed to run.");
-                        }
-                    }
-                    else
-                    {
-                        _logCatcher.Error($"{settings.ServiceName} downed. Maximum restart attempts exceeded.");
-                    }
-                }
-                else
-                {
-                    _logCatcher.Information($"{settings.ServiceName} is working.");
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logCatcher.Error($"Invalid operation when checking {settings.ServiceName}: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                _logCatcher.Error($"Error checking {settings.ServiceName}: {ex.Message}");
-            }
-        }
-
-        private Dictionary<string, Dictionary<string, ServiceSettings>> LoadServiceSettings()
-        {
-            Dictionary<string, Dictionary<string, ServiceSettings>> serviceSettings = new Dictionary<string, Dictionary<string, ServiceSettings>>();
-
-            try
-            {
-                serviceSettings = JsonHelper.LoadAllServiceSettings();
-            }
-            catch (Exception ex)
-            {
-                _logCatcher.Error($"Error loading service settings: {ex.Message}");
-            }
-
-            return serviceSettings;
-        }
-
     }
 }

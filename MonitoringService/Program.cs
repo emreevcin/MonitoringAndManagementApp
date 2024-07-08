@@ -20,11 +20,18 @@ namespace MonitoringService
         {
 
             ServiceBase[] ServicesToRun;
+
             var logCatcher = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
-              
+            var serviceSettingsLoader = new JsonServiceSettingsLoader(logCatcher);
+            var serviceMonitors = new Dictionary<string, IServiceMonitor>
+            {
+                { "Services", new WindowsServiceMonitor(logCatcher) },
+                { "WebApis", new IISServiceMonitor(logCatcher) }
+            };
+                
             ServicesToRun = new ServiceBase[]
             {
-                new MonitoringService(logCatcher)
+                new MonitoringService(logCatcher, serviceSettingsLoader, serviceMonitors)
             };
             ServiceBase.Run(ServicesToRun);
         }

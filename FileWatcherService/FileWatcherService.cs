@@ -16,7 +16,7 @@ namespace FileWatcherService
         {
             InitializeComponent();
             _logCatcher = logCatcher;
-            _path = path;//settings'ten gelecek
+            _path = path;
         }
 
         protected override void OnStart(string[] args)
