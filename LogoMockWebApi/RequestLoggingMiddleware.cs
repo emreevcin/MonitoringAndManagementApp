@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Serilog;
+﻿using Serilog;
 using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
 
 public class RequestLoggingMiddleware
 {
