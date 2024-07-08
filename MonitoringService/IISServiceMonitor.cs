@@ -1,10 +1,6 @@
 ﻿using Serilog;
 using Microsoft.Web.Administration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Util;
 
 namespace MonitoringService
@@ -53,8 +49,12 @@ namespace MonitoringService
                         }
                         else
                         {
-                            _logCatcher.Information($"{settings.ServiceName} is working.");
+                            _logCatcher.Information($"{settings.ServiceName} is running.");
                         }
+                    }
+                    else
+                    {
+                        _logCatcher.Warning($"Application pool '{serviceName}' not found.");
                     }
                 }
 

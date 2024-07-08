@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ServiceProcess;
 using System.Timers;
-using Microsoft.Web.Administration;
 using Serilog;
 using Util;
 

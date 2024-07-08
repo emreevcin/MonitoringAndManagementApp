@@ -1,13 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Serilog;
-using System;
-using System.Configuration;
+﻿using Serilog;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MonitoringService
 {

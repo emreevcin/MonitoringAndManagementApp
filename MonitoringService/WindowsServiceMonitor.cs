@@ -1,10 +1,6 @@
 ﻿using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 using Util;
 
 namespace MonitoringService
@@ -33,7 +29,7 @@ namespace MonitoringService
                         service.Start();
                         settings.NumberOfRuns--;
 
-                        int waitTime = Math.Min(settings.MonitorInterval * 200, 2000);
+                        int waitTime = Math.Min(settings.MonitorInterval / 2, 2000);
                         service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromMilliseconds(waitTime));
 
                         if (service.Status == ServiceControllerStatus.Running)
@@ -52,7 +48,7 @@ namespace MonitoringService
                 }
                 else
                 {
-                    _logCatcher.Information($"{settings.ServiceName} is working.");
+                    _logCatcher.Information($"{settings.ServiceName} is running.");
                 }
             }
             catch (InvalidOperationException ex)
