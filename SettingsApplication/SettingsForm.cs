@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Serilog;
+using System;
+using System.ServiceProcess;
 using System.Windows.Forms;
 using Util;
 
@@ -6,12 +8,14 @@ namespace SettingsApplication
 {
     public partial class SettingsForm : Form
     {
+        private readonly ILogger _logger;
         private readonly ISettingsLoader _settingsLoader;
         private readonly ISettingsSaver _settingsSaver;
         private readonly IConfigUpdater _configUpdater;
 
-        public SettingsForm(ISettingsLoader settingsLoader, ISettingsSaver settingsSaver, IConfigUpdater configUpdater)
+        public SettingsForm(ILogger logCatcher, ISettingsLoader settingsLoader, ISettingsSaver settingsSaver, IConfigUpdater configUpdater)
         {
+            _logger = logCatcher;
             _settingsLoader = settingsLoader;
             _settingsSaver = settingsSaver;
             _configUpdater = configUpdater;
@@ -40,7 +44,7 @@ namespace SettingsApplication
 
                 if (jsonObject != null)
                 {
-                    var settings = jsonObject.ToObject<ServiceSettings>(); 
+                    var settings = jsonObject.ToObject<ServiceSettings>();
 
                     textBoxTimeInterval.Text = settings.MonitorInterval?.ToString();
                     textBoxNumberOfRuns.Text = settings.NumberOfRuns?.ToString();
@@ -49,9 +53,15 @@ namespace SettingsApplication
                     UpdateVisibility(serviceName);
                     UpdateFields(serviceName, settings);
                 }
+                else
+                {
+                    _logger.Warning("Settings file not found for {ServiceName}.", serviceName);
+                    MessageBox.Show("Settings file not found.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "An error occurred while loading settings.");
                 MessageBox.Show($"An error occurred while loading settings: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -87,16 +97,23 @@ namespace SettingsApplication
 
             if (string.IsNullOrEmpty(serviceName))
             {
+                _logger.Error("Please select a service name. Service name cannot be null or empty.");
                 MessageBox.Show("Please select a service name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
+            var monitorInterval = textBoxTimeInterval.Text;
+            var numberOfRuns = textBoxNumberOfRuns.Text;
+            var logLevel = comboBoxLogLevel.SelectedItem?.ToString();
+
+            checkValidation(monitorInterval, numberOfRuns, serviceName); 
+
             var serviceSettings = new ServiceSettings
             {
                 ServiceName = serviceName,
-                MonitorInterval = int.TryParse(textBoxTimeInterval.Text, out var interval) ? interval : 1,
-                NumberOfRuns = int.TryParse(textBoxNumberOfRuns.Text, out var runs) ? runs : 1,
-                LogLevel = comboBoxLogLevel.SelectedItem?.ToString()
+                MonitorInterval = int.Parse(monitorInterval),
+                NumberOfRuns = int.Parse(numberOfRuns),
+                LogLevel = logLevel
             };
 
             if (serviceName.Contains("Service"))
@@ -114,14 +131,17 @@ namespace SettingsApplication
 
                 if (serviceName.Contains("Service"))
                 {
+                    // absolute path of the app.config file
                     string appConfigPath = $@"C:\Users\Emre.Evcin\source\repos\ManagementService\{serviceName}\App.config";
-                    _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, serviceSettings.FolderPath, appConfigPath);
+                    _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
                 }
 
+                _logger.Information("Settings saved successfully!");
                 MessageBox.Show("Settings saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "An error occurred while saving settings.");
                 MessageBox.Show($"An error occurred while saving settings: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -136,5 +156,55 @@ namespace SettingsApplication
                 }
             }
         }
+
+        private void checkValidation(string monitorInterval, string numberOfRuns, string serviceName)
+        {
+            if (!ValidateInteger(monitorInterval))
+            {
+                _logger.Error("Monitor Interval should be a valid integer.");
+                MessageBox.Show("Please enter a valid Monitor Interval.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!ValidateInteger(numberOfRuns))
+            {
+                _logger.Error("Number of Runs should be a valid integer.");
+                MessageBox.Show("Please enter a valid Number of Runs.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (serviceName.Contains("Service") && !ValidateFolderPath(textBoxFolderPath.Text))
+            {
+                _logger.Error("Invalid folder path: {Path}", textBoxFolderPath.Text);
+                MessageBox.Show("Please enter a valid Folder Path.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (serviceName.Contains("WebApi") && !ValidateUrl(textBoxUrl.Text))
+            {
+                _logger.Error("Invalid URL format: {Url}", textBoxUrl.Text);
+                MessageBox.Show("Please enter a valid URL.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+        }
+
+        private bool ValidateUrl(string url)
+        {
+            IValidator<string> validator = new UrlValidator();
+            return validator.Validate(url);
+        }
+
+        private bool ValidateFolderPath(string path)
+        {
+            IValidator<string> validator = new FolderPathValidator();
+            return validator.Validate(path);
+        }
+
+        private bool ValidateInteger(string value)
+        {
+            IValidator<string> validator = new IntegerValidator();
+            return validator.Validate(value);
+        }
+
     }
 }

@@ -8,6 +8,6 @@ namespace SettingsApplication
 {
     public interface IConfigUpdater
     {
-        void UpdateAppConfigLogLevel(string serviceName, string logLevel, string folderPath, string appConfigPath);
+        void UpdateAppConfigLogLevel(string serviceName, string logLevel, string appConfigPath);
     }
 }

@@ -116,6 +116,28 @@ namespace Util
             }
         }
 
+        public static string GetServiceUrl(string serviceName)
+        {
+            try
+            {
+                dynamic allSettings = LoadAllSettings();
+                if (allSettings != null)
+                {
+                    if (allSettings.ContainsKey("Services") && allSettings["Services"][serviceName] != null)
+                    {
+                        var serviceSettings = allSettings["Services"][serviceName];
+                        string url = serviceSettings["Url"];
+                        return url;
+                    }
+                }
+                return null; // If service or url not found, return null
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving service URL: {ex.Message}");
+            }
+        }
+
         private static dynamic LoadAllSettings()
         {
             try

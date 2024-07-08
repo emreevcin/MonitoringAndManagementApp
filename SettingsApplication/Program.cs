@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Serilog;
+using System;
 using System.Windows.Forms;
 
 namespace SettingsApplication
@@ -17,11 +15,13 @@ namespace SettingsApplication
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            var logCatcher = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
+
             var settingsLoader = new JsonSettingsLoader();
             var settingsSaver = new JsonSettingsSaver();
             var configUpdater = new AppConfigUpdater();
 
-            Application.Run(new SettingsForm(settingsLoader, settingsSaver, configUpdater));
+            Application.Run(new SettingsForm(logCatcher, settingsLoader, settingsSaver, configUpdater));
         }
     }
 }
