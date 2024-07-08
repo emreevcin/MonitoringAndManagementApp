@@ -102,31 +102,51 @@ namespace SettingsApplication
                 return;
             }
 
-            var monitorInterval = textBoxTimeInterval.Text;
-            var numberOfRuns = textBoxNumberOfRuns.Text;
+            var monitorIntervalText = textBoxTimeInterval.Text;
+            var numberOfRunsText = textBoxNumberOfRuns.Text;
             var logLevel = comboBoxLogLevel.SelectedItem?.ToString();
-
-            checkValidation(monitorInterval, numberOfRuns, serviceName); 
-
-            var serviceSettings = new ServiceSettings
-            {
-                ServiceName = serviceName,
-                MonitorInterval = int.Parse(monitorInterval),
-                NumberOfRuns = int.Parse(numberOfRuns),
-                LogLevel = logLevel
-            };
-
-            if (serviceName.Contains("Service"))
-            {
-                serviceSettings.FolderPath = textBoxFolderPath.Text;
-            }
-            else if (serviceName.Contains("WebApi"))
-            {
-                serviceSettings.Url = textBoxUrl.Text;
-            }
 
             try
             {
+                checkValidation(monitorIntervalText, numberOfRunsText, serviceName);
+
+                if (!int.TryParse(monitorIntervalText, out var monitorInterval))
+                {
+                    _logger.Error($"Monitor Interval should be a valid integer. {monitorIntervalText} is not valid.");
+                    throw new FormatException("Monitor Interval should be a valid integer.");
+                }
+
+                if (!int.TryParse(numberOfRunsText, out var numberOfRuns))
+                {
+                    _logger.Error($"Number of Runs should be a valid integer. {numberOfRunsText} is not valid.");
+                    throw new FormatException("Number of Runs should be a valid integer.");
+                }
+
+                var serviceSettings = new ServiceSettings
+                {
+                    ServiceName = serviceName,
+                    MonitorInterval = monitorInterval,
+                    NumberOfRuns = numberOfRuns,
+                    LogLevel = logLevel
+                };
+
+                if (serviceName.Contains("Service"))
+                {
+                    if (!ValidateFolderPath(textBoxFolderPath.Text))
+                    {
+                        return;
+                    }
+                    serviceSettings.FolderPath = textBoxFolderPath.Text;
+                }
+                else if (serviceName.Contains("WebApi"))
+                {
+                    if (!ValidateUrl(textBoxUrl.Text))
+                    {
+                        return;
+                    }
+                    serviceSettings.Url = textBoxUrl.Text;
+                }
+
                 _settingsSaver.SaveSettings(serviceName, serviceSettings);
 
                 if (serviceName.Contains("Service"))
@@ -135,14 +155,22 @@ namespace SettingsApplication
                     string appConfigPath = $@"C:\Users\Emre.Evcin\source\repos\ManagementService\{serviceName}\App.config";
                     _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
                 }
-
                 _logger.Information("Settings saved successfully!");
                 MessageBox.Show("Settings saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (FormatException ex)
+            {
+                _logger.Error(ex, "Invalid input format: {Message}", ex.Message);
+                MessageBox.Show($"Invalid input format: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error occurred while saving settings.");
                 MessageBox.Show($"An error occurred while saving settings: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+               LoadSettings(serviceName);
             }
         }
 
@@ -163,30 +191,27 @@ namespace SettingsApplication
             {
                 _logger.Error("Monitor Interval should be a valid integer.");
                 MessageBox.Show("Please enter a valid Monitor Interval.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
             }
 
             if (!ValidateInteger(numberOfRuns))
             {
                 _logger.Error("Number of Runs should be a valid integer.");
                 MessageBox.Show("Please enter a valid Number of Runs.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
             }
 
             if (serviceName.Contains("Service") && !ValidateFolderPath(textBoxFolderPath.Text))
             {
                 _logger.Error("Invalid folder path: {Path}", textBoxFolderPath.Text);
                 MessageBox.Show("Please enter a valid Folder Path.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
             }
 
             if (serviceName.Contains("WebApi") && !ValidateUrl(textBoxUrl.Text))
             {
                 _logger.Error("Invalid URL format: {Url}", textBoxUrl.Text);
                 MessageBox.Show("Please enter a valid URL.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
             }
         }
+
 
         private bool ValidateUrl(string url)
         {
