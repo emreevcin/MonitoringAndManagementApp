@@ -108,7 +108,7 @@ namespace SettingsApplication
 
             try
             {
-                checkValidation(monitorIntervalText, numberOfRunsText, serviceName);
+                CheckValidation(monitorIntervalText, numberOfRunsText, serviceName);
 
                 if (!int.TryParse(monitorIntervalText, out var monitorInterval))
                 {
@@ -185,7 +185,7 @@ namespace SettingsApplication
             }
         }
 
-        private void checkValidation(string monitorInterval, string numberOfRuns, string serviceName)
+        private void CheckValidation(string monitorInterval, string numberOfRuns, string serviceName)
         {
             if (!ValidateInteger(monitorInterval))
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using Serilog;
 using Serilog.Events;
 
 
@@ -6,8 +7,11 @@ namespace Util
 {
     public static class LogLevel
     {
+        private static readonly ILogger logger = SerilogHelper.GetLogger();
+
         public static string GetLogLevel(string serviceName)
         {
+            string defaultLogLevel = "information"; 
             try
             {
                 dynamic serviceSettings = JsonHelper.LoadServiceSettings(serviceName);
@@ -15,11 +19,13 @@ namespace Util
                 {
                     return serviceSettings.LogLevel;
                 }
-                return null;
+                logger.Warning($"LogLevel not found for service '{serviceName}'. Using default: {defaultLogLevel}");
+                return defaultLogLevel;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error getting log level: {ex.Message}"); // log dosyasına bas MonitoringService
+                logger.Error($"Error getting log level: {ex.Message}");
+                throw new Exception($"Error getting log level: {ex.Message}");
             }
         }
 

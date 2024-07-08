@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,9 +10,11 @@ namespace Util
     public static class JsonHelper
     {
         private static string settingsFilePath = "C:\\MonitoringAndManagementApplication\\appsettings.json";//kullancıdan alınabilir.
+        private static readonly ILogger logger = SerilogHelper.GetLogger();
 
         public static void SaveServiceSettings(string serviceKey, ServiceSettings serviceSettings)
         {
+            logger.Information($"Saving settings for {serviceKey}");
             try
             {
                 dynamic allSettings = LoadAllSettings();
@@ -33,12 +36,14 @@ namespace Util
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error saving settings: {ex.Message}");//loga
+                logger.Error($"Error saving settings: {ex.Message}");
+                throw new Exception($"Error saving settings: {ex.Message}");
             }
         }
 
         public static dynamic LoadServiceSettings(string serviceKey)
         {
+            logger.Information($"Loading settings for {serviceKey}");
             try
             {
                 dynamic allSettings = LoadAllSettings();
