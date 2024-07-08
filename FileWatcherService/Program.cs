@@ -19,7 +19,7 @@ namespace FileWatcherService
         static void Main()
         {
             ServiceBase[] ServicesToRun;
-            string path = JsonHelper.GetServicePath(serviceName);
+            string path = ServiceSettingManager.GetServicePath(serviceName);
 
             ILogger configuration = ConfigureLogger();
             

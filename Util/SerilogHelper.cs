@@ -12,7 +12,7 @@ namespace Util
         {
             logger = new LoggerConfiguration()
                 .WriteTo.File("C:\\MonitoringAndManagementApplication\\Logs\\MonitoringService-.log", rollingInterval: RollingInterval.Day)
-                .MinimumLevel.Error()
+                .MinimumLevel.Warning()
                 .Enrich.FromLogContext()
                 .CreateLogger();
         }

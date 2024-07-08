@@ -9,72 +9,67 @@ namespace Util
 {
     public static class JsonHelper
     {
-        private static string settingsFilePath = "C:\\MonitoringAndManagementApplication\\appsettings.json";//kullancıdan alınabilir.
+        private static string settingsFilePath = Constants.settingsFilePath;
         private static readonly ILogger logger = SerilogHelper.GetLogger();
+        private static readonly ISettingsRepository settingsRepository = new JsonSettingsRepository(settingsFilePath);
 
         public static void SaveServiceSettings(string serviceKey, ServiceSettings serviceSettings)
         {
             logger.Information($"Saving settings for {serviceKey}");
+
             try
             {
-                dynamic allSettings = LoadAllSettings();
-                if (allSettings == null)
-                {
-                    allSettings = new JObject();
-                }
-
-                string categoryName = serviceKey.Contains("Service") ? "Services" : "WebApis";
-                if (!allSettings.ContainsKey(categoryName))
-                {
-                    allSettings[categoryName] = new JObject();
-                }
-
-                allSettings[categoryName][serviceKey] = JObject.FromObject(serviceSettings);
-
-                string json = JsonConvert.SerializeObject(allSettings, Formatting.Indented);
-                File.WriteAllText(settingsFilePath, json);
+                dynamic allSettings = settingsRepository.LoadAllSettings() ?? new JObject();
+                UpdateServiceSettings(allSettings, serviceKey, serviceSettings);
+                settingsRepository.SaveAllSettings(allSettings);
             }
             catch (Exception ex)
             {
-                logger.Error($"Error saving settings: {ex.Message}");
-                throw new Exception($"Error saving settings: {ex.Message}");
+                logger.Error($"Error saving service settings: {ex.Message}");
+                throw new Exception("Error saving service settings", ex);
             }
         }
 
-        public static dynamic LoadServiceSettings(string serviceKey)
+        public static ServiceSettings LoadServiceSettings(string serviceKey)
         {
             logger.Information($"Loading settings for {serviceKey}");
+
             try
             {
-                dynamic allSettings = LoadAllSettings();
+                dynamic allSettings = settingsRepository.LoadAllSettings();
                 if (allSettings != null)
                 {
                     string categoryName = serviceKey.Contains("Service") ? "Services" : "WebApis";
                     if (allSettings.ContainsKey(categoryName) && allSettings[categoryName][serviceKey] != null)
                     {
-                        return allSettings[categoryName][serviceKey];
+                        return allSettings[categoryName][serviceKey].ToObject<ServiceSettings>();
+                    }
+                    else
+                    {
+                        logger.Warning($"Settings for {serviceKey} not found in category {categoryName}. Returning default settings.");
+                        return CreateDefaultServiceSettings(serviceKey);
                     }
                 }
-                return null;//log basmalıyız.
+                logger.Warning("All settings are null. Returning default settings.");
+                return CreateDefaultServiceSettings(serviceKey);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error loading settings: {ex.Message}");//loga
+                logger.Error($"Error loading settings: {ex.Message}");
+                throw new Exception("Error loading settings:", ex);
             }
         }
-        //kodların ortaklaştırılması.
+
         public static Dictionary<string, Dictionary<string, ServiceSettings>> LoadAllServiceSettings()
         {
             try
             {
+                dynamic allSettings = settingsRepository.LoadAllSettings();
                 Dictionary<string, Dictionary<string, ServiceSettings>> categorizedSettings = new Dictionary<string, Dictionary<string, ServiceSettings>>();
 
-                if (File.Exists(settingsFilePath))
-                {//kondisyonlar kontrol edilebilir.
-                    string json = File.ReadAllText(settingsFilePath);
-                    var allSettings = JsonConvert.DeserializeObject<JObject>(json);
-
-                    foreach (var category in allSettings.Properties()) 
+                if (allSettings != null)
+                {
+                    foreach (var category in allSettings.Properties())
                     {
                         string categoryName = category.Name;
                         foreach (var serviceKey in category.Value.Children<JProperty>())
@@ -90,74 +85,35 @@ namespace Util
                         }
                     }
                 }
+                else
+                {
+                    logger.Warning("All settings are null. No settings loaded.");
+                }
 
-                return categorizedSettings;//boş olma durumu :)
+                return categorizedSettings;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error loading all service settings: {ex.Message}");
+                logger.Error($"Error loading all service settings: {ex.Message}");
+                throw new Exception("Error loading all service settings:", ex);
             }
         }
 
-        public static string GetServicePath(string serviceName)
+        private static void UpdateServiceSettings(dynamic allSettings, string serviceKey, ServiceSettings serviceSettings)
         {
-            try
+            string categoryName = serviceKey.Contains("Service") ? "Services" : "WebApis";
+            if (!allSettings.ContainsKey(categoryName))
             {
-                dynamic allSettings = LoadAllSettings();
-                if (allSettings != null)
-                {
-                    if (allSettings.ContainsKey("Services") && allSettings["Services"][serviceName] != null)
-                    {
-                        var serviceSettings = allSettings["Services"][serviceName];
-                        string path = serviceSettings["FolderPath"];
-                        return path;
-                    }
-                }
-                return null; // If service or path not found, return null
+                allSettings[categoryName] = new JObject();
+                logger.Information($"Added new category '{categoryName}' to settings.");
             }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving service path: {ex.Message}");
-            }
+            allSettings[categoryName][serviceKey] = JObject.FromObject(serviceSettings);
         }
 
-        public static string GetServiceUrl(string serviceName)
+        private static ServiceSettings CreateDefaultServiceSettings(string serviceKey)
         {
-            try
-            {
-                dynamic allSettings = LoadAllSettings();
-                if (allSettings != null)
-                {
-                    if (allSettings.ContainsKey("Services") && allSettings["Services"][serviceName] != null)
-                    {
-                        var serviceSettings = allSettings["Services"][serviceName];
-                        string url = serviceSettings["Url"];
-                        return url;
-                    }
-                }
-                return null; // If service or url not found, return null
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving service URL: {ex.Message}");
-            }
-        }
-
-        private static dynamic LoadAllSettings()
-        {
-            try
-            {
-                if (File.Exists(settingsFilePath))
-                {
-                    string json = File.ReadAllText(settingsFilePath);
-                    return JsonConvert.DeserializeObject<JObject>(json);
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error loading settings: {ex.Message}");
-            }
+            logger.Information($"Creating default settings for {serviceKey}");
+            return ServiceSettingsFactory.CreateDefaultServiceSettings(serviceKey);
         }
     }
 }

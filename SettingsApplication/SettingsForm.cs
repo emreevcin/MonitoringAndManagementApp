@@ -40,14 +40,12 @@ namespace SettingsApplication
         {
             try
             {
-                var jsonObject = JsonHelper.LoadServiceSettings(serviceName);
+                ServiceSettings settings = JsonHelper.LoadServiceSettings(serviceName);
 
-                if (jsonObject != null)
+                if (settings != null)
                 {
-                    var settings = jsonObject.ToObject<ServiceSettings>();
-
-                    textBoxTimeInterval.Text = settings.MonitorInterval?.ToString();
-                    textBoxNumberOfRuns.Text = settings.NumberOfRuns?.ToString();
+                    textBoxTimeInterval.Text = settings.MonitorInterval.ToString();
+                    textBoxNumberOfRuns.Text = settings.NumberOfRuns.ToString();
                     comboBoxLogLevel.SelectedItem = settings.LogLevel;
 
                     UpdateVisibility(serviceName);
@@ -65,6 +63,7 @@ namespace SettingsApplication
                 MessageBox.Show($"An error occurred while loading settings: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
 
         private void UpdateVisibility(string serviceName)

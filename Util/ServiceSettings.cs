@@ -6,7 +6,7 @@ namespace Util
     {
         public ServiceSettings()
         {
-            LogLevel = "Information";//enum değerinin stringi geliyor mu kontrol edelim.--constant classta toplanacak.
+            LogLevel = "information";
         }
         public string ServiceName { get; set; }
         public int MonitorInterval { get; set; }
