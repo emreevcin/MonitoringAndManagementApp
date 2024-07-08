@@ -1,0 +1,6 @@
+@LogoMockWebApi_HostAddress = http://localhost:5103
+
+GET {{LogoMockWebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
