@@ -306,10 +306,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IISServiceMonitor.cs" />
-    <Compile Include="IServiceMonitor.cs" />
-    <Compile Include="IServiceSettingsLoader.cs" />
-    <Compile Include="JsonServiceSettingsLoader.cs" />
+    <Compile Include="Services\IISServiceMonitor.cs" />
+    <Compile Include="Services\IServiceMonitor.cs" />
     <Compile Include="MonitoringService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -324,7 +322,7 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WindowsServiceMonitor.cs" />
+    <Compile Include="Services\WindowsServiceMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceProcess;
 using System.Timers;
 using Serilog;
@@ -9,14 +10,12 @@ namespace MonitoringService
     public partial class MonitoringService : ServiceBase
     {
         private readonly ILogger _logCatcher;
-        private readonly IServiceSettingsLoader _serviceSettingsLoader;
         private readonly Dictionary<string, IServiceMonitor> _serviceMonitors;
 
-        public MonitoringService(ILogger logCatcher, IServiceSettingsLoader serviceSettingsLoader, Dictionary<string, IServiceMonitor> serviceMonitors)
+        public MonitoringService(ILogger logCatcher, Dictionary<string, IServiceMonitor> serviceMonitors)
         {
             InitializeComponent();
             _logCatcher = logCatcher;
-            _serviceSettingsLoader = serviceSettingsLoader;
             _serviceMonitors = serviceMonitors;
         }
 
@@ -33,34 +32,40 @@ namespace MonitoringService
 
         private void StartMonitoring()
         {
-            var servicesToMonitor = _serviceSettingsLoader.LoadServiceSettings();
-
-            foreach (var categoryEntry in servicesToMonitor)
+            try
             {
-                string categoryName = categoryEntry.Key;
-                var servicesInCategory = categoryEntry.Value;
-
-                if (!_serviceMonitors.ContainsKey(categoryName))
+                var servicesToMonitor = SettingsJsonHelper.LoadAllServiceSettings();
+                foreach (var categoryEntry in servicesToMonitor)
                 {
-                    _logCatcher.Warning($"Unknown category '{categoryName}' encountered. No monitoring action taken for services in this category.");
-                    continue;
-                }
+                    string categoryName = categoryEntry.Key;
+                    var servicesInCategory = categoryEntry.Value;
 
-                var serviceMonitor = _serviceMonitors[categoryName];
-
-                foreach (var serviceEntry in servicesInCategory)
-                {
-                    string serviceName = serviceEntry.Key;
-                    ServiceSettingsDto settings = serviceEntry.Value;
-
-                    Timer timer = new Timer
+                    if (!_serviceMonitors.ContainsKey(categoryName))
                     {
-                        Interval = settings.MonitorInterval * 1000,
-                        Enabled = true
-                    };
-                    timer.Elapsed += (sender, e) => serviceMonitor.MonitorService(serviceName, settings);
-                    timer.Start();
+                        _logCatcher.Warning($"Unknown category '{categoryName}' encountered. No monitoring action taken for services in this category.");
+                        continue;
+                    }
+
+                    var serviceMonitor = _serviceMonitors[categoryName];
+
+                    foreach (var serviceEntry in servicesInCategory)
+                    {
+                        string serviceName = serviceEntry.Key;
+                        ServiceSettingsDto settings = serviceEntry.Value;
+
+                        Timer timer = new Timer
+                        {
+                            Interval = settings.MonitorInterval * 1000,
+                            Enabled = true
+                        };
+                        timer.Elapsed += (sender, e) => serviceMonitor.MonitorService(serviceName, settings);
+                        timer.Start();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logCatcher.Error($"Error loading service settings: {ex.Message}");
             }
         }
     }
