@@ -10,16 +10,8 @@ namespace LogoMockWebApi
     {
         public static void Main(string[] args)
         {
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            LogHelper.Initialize(configuration);
-
             try
             {
-                Log.Information("Starting web host");
-
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
@@ -28,7 +20,6 @@ namespace LogoMockWebApi
             }
             finally
             {
-                Log.Information("Closing web host");
                 Log.CloseAndFlush();
             }
         }
@@ -39,7 +30,6 @@ namespace LogoMockWebApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://localhost:88/swagger/index.html");
                 });
     }
 }

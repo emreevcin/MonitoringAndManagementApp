@@ -7,7 +7,7 @@ namespace LogoMockWebApi
     {
         private static IConfiguration Configuration { get; set; }
 
-        private static string serviceName = "LogoMockWebApi";
+        private readonly static string _serviceName = "LogoMockWebApi";
 
         public static void Initialize(IConfiguration configuration)
         {
@@ -17,7 +17,7 @@ namespace LogoMockWebApi
 
         public static void ConfigureLogger()
         {
-            string logLevelString = Util.LogLevel.GetLogLevel(serviceName);
+            string logLevelString = Util.LogLevel.GetLogLevel(_serviceName);
             LogEventLevel logLevel = Util.LogLevel.ConvertToLogEventLevel(logLevelString);
 
             var loggerConfig = new LoggerConfiguration()

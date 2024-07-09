@@ -13,6 +13,7 @@ namespace LogoMockWebApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            LogHelper.Initialize(Configuration);
         }
 
         public IConfiguration Configuration { get; }
@@ -31,6 +32,9 @@ namespace LogoMockWebApi
             // Add hosted service
             services.AddHostedService<IISServiceWatcher>();
 
+            // Add Serilog request logging middleware
+            services.AddSingleton<RequestLoggingMiddleware>();
+
             // Other services configuration can be added here as needed
         }
 
@@ -41,6 +45,17 @@ namespace LogoMockWebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseExceptionHandler("/error");
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
 
             // Enable Swagger UI
             app.UseSwagger();
@@ -51,10 +66,6 @@ namespace LogoMockWebApi
 
             // Serilog request logging middleware
             app.UseMiddleware<RequestLoggingMiddleware>();
-
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
