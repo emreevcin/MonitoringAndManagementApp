@@ -8,25 +8,25 @@ namespace Util
 {
     public class JsonSettingsRepository : ISettingsRepository
     {
-        private readonly string settingsFilePath = Constants.settingsFilePath;
+        private readonly string _settingsFilePath = Constants.settingsFilePath;
         private static readonly ILogger logger = SerilogHelper.GetLogger();
 
         public JsonSettingsRepository(string filePath)
         {
-            settingsFilePath = filePath;
+            _settingsFilePath = filePath;
         }
         public Dictionary<string, Dictionary<string, ServiceSettingsDto>> LoadAllSettings()
         {
             try
             {
-                if (File.Exists(settingsFilePath))
+                if (File.Exists(_settingsFilePath))
                 {
-                    string json = File.ReadAllText(settingsFilePath);
+                    string json = File.ReadAllText(_settingsFilePath);
                     return JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, ServiceSettingsDto>>>(json);
                 }
                 else
                 {
-                    logger.Warning($"Settings file not found at {settingsFilePath}");
+                    logger.Warning($"Settings file not found at {_settingsFilePath}");
                     return HandleMissingSettingsFile();
                 }
             }
@@ -42,7 +42,7 @@ namespace Util
             try
             {
                 string json = JsonConvert.SerializeObject(allSettings, Formatting.Indented);
-                File.WriteAllText(settingsFilePath, json);
+                File.WriteAllText(_settingsFilePath, json);
             }
             catch (Exception ex)
             {
@@ -55,7 +55,7 @@ namespace Util
         {
             var defaultSettings = new Dictionary<string, Dictionary<string, ServiceSettingsDto>>();
             SaveAllSettings(defaultSettings);
-            logger.Warning($"Created default settings file at {settingsFilePath}");
+            logger.Warning($"Created default settings file at {_settingsFilePath}");
             return defaultSettings;
         }
     }

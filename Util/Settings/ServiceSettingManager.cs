@@ -18,7 +18,7 @@ namespace Util
             return GetServiceSetting(serviceName, "Url");
         }
 
-        private static string GetCategoryName(string serviceName)
+        internal static string GetCategoryName(string serviceName)
         {
             return serviceName.Contains("Service") ? "Services" : "WebApis";
         }

@@ -1,5 +1,4 @@
-﻿using Serilog.Events;
-using Serilog;
+﻿using Serilog;
 
 namespace LogoMockWebApi
 {
@@ -17,8 +16,8 @@ namespace LogoMockWebApi
 
         public static void ConfigureLogger()
         {
-            string logLevelString = Util.LogLevel.GetLogLevel(_serviceName);
-            LogEventLevel logLevel = Util.LogLevel.ConvertToLogEventLevel(logLevelString);
+            var logLevel = Util.LogLevel.GetLogEventLevel(_serviceName);
+
 
             var loggerConfig = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)

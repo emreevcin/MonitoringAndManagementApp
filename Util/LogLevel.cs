@@ -2,16 +2,31 @@
 using Serilog;
 using Serilog.Events;
 
-
 namespace Util
 {
     public static class LogLevel
     {
         private static readonly ILogger logger = SerilogHelper.GetLogger();
 
-        public static string GetLogLevel(string serviceName)
+        public enum LogLevelEnum
         {
-            string defaultLogLevel = "information"; 
+            Verbose,
+            Debug,
+            Warning,
+            Error,
+            Fatal,
+            Information
+        }
+
+        public static LogEventLevel GetLogEventLevel(string serviceName)
+        {
+            string logLevel = GetLogLevel(serviceName);
+            return ConvertToLogEventLevel(logLevel);
+        }
+
+        private static string GetLogLevel(string serviceName)
+        {
+            string defaultLogLevel = Constants.DefaultLogLevel.ToString();
             try
             {
                 dynamic serviceSettings = SettingsJsonHelper.LoadServiceSettings(serviceName);
@@ -29,24 +44,32 @@ namespace Util
             }
         }
 
-        public static LogEventLevel ConvertToLogEventLevel(string logLevel)
+        private static LogEventLevel ConvertToLogEventLevel(string logLevel)
         {
-            switch (logLevel.ToLower())
+            LogLevelEnum parsedLevel;
+            if (Enum.TryParse(logLevel, true, out parsedLevel))
             {
-                case "verbose":
-                    return LogEventLevel.Verbose;
-                case "debug":
-                    return LogEventLevel.Debug;
-                case "warning":
-                    return LogEventLevel.Warning;
-                case "error":
-                    return LogEventLevel.Error;
-                case "fatal":
-                    return LogEventLevel.Fatal;
-                case "information":
-                case "info":
-                default:
-                    return LogEventLevel.Information;
+                switch (parsedLevel)
+                {
+                    case LogLevelEnum.Verbose:
+                        return LogEventLevel.Verbose;
+                    case LogLevelEnum.Debug:
+                        return LogEventLevel.Debug;
+                    case LogLevelEnum.Warning:
+                        return LogEventLevel.Warning;
+                    case LogLevelEnum.Error:
+                        return LogEventLevel.Error;
+                    case LogLevelEnum.Fatal:
+                        return LogEventLevel.Fatal;
+                    case LogLevelEnum.Information:
+                    default:
+                        return LogEventLevel.Information;
+                }
+            }
+            else
+            {
+                logger.Warning($"Unknown log level '{logLevel}'. Using default: {LogLevelEnum.Information}");
+                return LogEventLevel.Information;
             }
         }
     }

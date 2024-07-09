@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Serilog;
+﻿using Serilog;
 
 
 namespace Util
@@ -11,7 +10,7 @@ namespace Util
         static SerilogHelper()
         {
             logger = new LoggerConfiguration()
-                .WriteTo.File("C:\\MonitoringAndManagementApplication\\Logs\\MonitoringService-.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(Constants.logFilePath, rollingInterval: RollingInterval.Day)
                 .MinimumLevel.Warning()
                 .Enrich.FromLogContext()
                 .CreateLogger();
