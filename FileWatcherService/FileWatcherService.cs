@@ -2,7 +2,6 @@
 using System.IO;
 using System.ServiceProcess;
 using Serilog;
-    using System.Diagnostics;
 
 namespace FileWatcherService
 {

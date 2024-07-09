@@ -107,7 +107,11 @@ namespace SettingsApplication
 
             try
             {
-                CheckValidation(monitorIntervalText, numberOfRunsText, serviceName);
+                if (!Validation.CheckValidation(monitorIntervalText, numberOfRunsText, serviceName, textBoxFolderPath, textBoxUrl, _logger))
+                {
+                    _logger.Error("Validation failed. Please correct the errors and try again.");
+                    return;
+                }
 
                 if (!int.TryParse(monitorIntervalText, out var monitorInterval))
                 {
@@ -131,18 +135,10 @@ namespace SettingsApplication
 
                 if (serviceName.Contains("Service"))
                 {
-                    if (!ValidateFolderPath(textBoxFolderPath.Text))
-                    {
-                        return;
-                    }
                     serviceSettings.FolderPath = textBoxFolderPath.Text;
                 }
                 else if (serviceName.Contains("WebApi"))
                 {
-                    if (!ValidateUrl(textBoxUrl.Text))
-                    {
-                        return;
-                    }
                     serviceSettings.Url = textBoxUrl.Text;
                 }
 
@@ -183,52 +179,5 @@ namespace SettingsApplication
                 }
             }
         }
-
-        private void CheckValidation(string monitorInterval, string numberOfRuns, string serviceName)
-        {
-            if (!ValidateInteger(monitorInterval))
-            {
-                _logger.Error("Monitor Interval should be a valid integer.");
-                MessageBox.Show("Please enter a valid Monitor Interval.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            if (!ValidateInteger(numberOfRuns))
-            {
-                _logger.Error("Number of Runs should be a valid integer.");
-                MessageBox.Show("Please enter a valid Number of Runs.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            if (serviceName.Contains("Service") && !ValidateFolderPath(textBoxFolderPath.Text))
-            {
-                _logger.Error("Invalid folder path: {Path}", textBoxFolderPath.Text);
-                MessageBox.Show("Please enter a valid Folder Path.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            if (serviceName.Contains("WebApi") && !ValidateUrl(textBoxUrl.Text))
-            {
-                _logger.Error("Invalid URL format: {Url}", textBoxUrl.Text);
-                MessageBox.Show("Please enter a valid URL.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-
-        private bool ValidateUrl(string url)
-        {
-            IValidator<string> validator = new UrlValidator();
-            return validator.Validate(url);
-        }
-
-        private bool ValidateFolderPath(string path)
-        {
-            IValidator<string> validator = new FolderPathValidator();
-            return validator.Validate(path);
-        }
-
-        private bool ValidateInteger(string value)
-        {
-            IValidator<string> validator = new IntegerValidator();
-            return validator.Validate(value);
-        }
-
     }
 }
