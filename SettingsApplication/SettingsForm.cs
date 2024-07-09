@@ -3,22 +3,17 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 using Util;
+using Util.AppConfigSettings;
 
 namespace SettingsApplication
 {
     public partial class SettingsForm : Form
     {
         private readonly ILogger _logger;
-        private readonly ISettingsLoader _settingsLoader;
-        private readonly ISettingsSaver _settingsSaver;
-        private readonly IConfigUpdater _configUpdater;
 
-        public SettingsForm(ILogger logCatcher, ISettingsLoader settingsLoader, ISettingsSaver settingsSaver, IConfigUpdater configUpdater)
+        public SettingsForm(ILogger logCatcher)
         {
             _logger = logCatcher;
-            _settingsLoader = settingsLoader;
-            _settingsSaver = settingsSaver;
-            _configUpdater = configUpdater;
 
             InitializeComponent();
 
@@ -66,12 +61,13 @@ namespace SettingsApplication
 
         private void SaveSettings(string serviceName, ServiceSettingsDto serviceSettings)
         {
-            _settingsSaver.SaveSettings(serviceName, serviceSettings);
+            SettingsJsonHelper.SaveServiceSettings(serviceName, serviceSettings);
 
             if (serviceName.Contains("Service"))
             {
                 string appConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"..\{serviceName}\App.config");
-                _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
+                var updater = new AppConfigUpdater();
+                updater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
             }
         }
 

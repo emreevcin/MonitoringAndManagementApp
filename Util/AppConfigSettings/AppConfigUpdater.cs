@@ -1,8 +1,9 @@
 ﻿using System.Configuration;
 
-namespace SettingsApplication
+
+namespace Util.AppConfigSettings
 {
-    internal class AppConfigUpdater : IConfigUpdater
+    public class AppConfigUpdater : IConfigUpdater
     {
         public void UpdateAppConfigLogLevel(string serviceName, string logLevel, string appConfigPath)
         {

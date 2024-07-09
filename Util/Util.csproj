@@ -172,6 +172,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppConfigSettings\AppConfigUpdater.cs" />
+    <Compile Include="AppConfigSettings\IConfigUpdater.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="ISettingsRepository.cs" />
     <Compile Include="SettingsJsonHelper.cs" />

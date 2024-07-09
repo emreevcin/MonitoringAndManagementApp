@@ -19,11 +19,7 @@ namespace SettingsApplication
                 .ReadFrom.AppSettings()
                 .CreateLogger();
 
-            var settingsLoader = new JsonSettingsLoader();
-            var settingsSaver = new JsonSettingsSaver();
-            var configUpdater = new AppConfigUpdater();
-
-            Application.Run(new SettingsForm(logCatcher, settingsLoader, settingsSaver, configUpdater));
+            Application.Run(new SettingsForm(logCatcher));
         }
     }
 }
