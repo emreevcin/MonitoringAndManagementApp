@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System;
+using System.IO;
 using System.ServiceProcess;
 using System.Windows.Forms;
 using Util;
@@ -146,8 +147,7 @@ namespace SettingsApplication
 
                 if (serviceName.Contains("Service"))
                 {
-                    // absolute path of the app.config file
-                    string appConfigPath = $@"C:\Users\Emre.Evcin\source\repos\ManagementService\{serviceName}\App.config";
+                    string appConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"..\{serviceName}\App.config");
                     _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
                 }
                 _logger.Information("Settings saved successfully!");
