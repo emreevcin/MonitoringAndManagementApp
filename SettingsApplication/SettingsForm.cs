@@ -108,48 +108,15 @@ namespace SettingsApplication
 
             try
             {
-                if (!Validation.CheckValidation(monitorIntervalText, numberOfRunsText, serviceName, textBoxFolderPath, textBoxUrl, _logger))
+                if (!ValidateInputs(monitorIntervalText, numberOfRunsText, serviceName))
                 {
                     _logger.Error("Validation failed. Please correct the errors and try again.");
                     return;
                 }
 
-                if (!int.TryParse(monitorIntervalText, out var monitorInterval))
-                {
-                    _logger.Error($"Monitor Interval should be a valid integer. {monitorIntervalText} is not valid.");
-                    throw new FormatException("Monitor Interval should be a valid integer.");
-                }
+                var serviceSettings = CreateServiceSettings(serviceName, monitorIntervalText, numberOfRunsText, logLevel);
+                SaveSettings(serviceName, serviceSettings);
 
-                if (!int.TryParse(numberOfRunsText, out var numberOfRuns))
-                {
-                    _logger.Error($"Number of Runs should be a valid integer. {numberOfRunsText} is not valid.");
-                    throw new FormatException("Number of Runs should be a valid integer.");
-                }
-
-                var serviceSettings = new ServiceSettings
-                {
-                    ServiceName = serviceName,
-                    MonitorInterval = monitorInterval,
-                    NumberOfRuns = numberOfRuns,
-                    LogLevel = logLevel
-                };
-
-                if (serviceName.Contains("Service"))
-                {
-                    serviceSettings.FolderPath = textBoxFolderPath.Text;
-                }
-                else if (serviceName.Contains("WebApi"))
-                {
-                    serviceSettings.Url = textBoxUrl.Text;
-                }
-
-                _settingsSaver.SaveSettings(serviceName, serviceSettings);
-
-                if (serviceName.Contains("Service"))
-                {
-                    string appConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"..\{serviceName}\App.config");
-                    _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
-                }
                 _logger.Information("Settings saved successfully!");
                 MessageBox.Show("Settings saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -177,6 +144,64 @@ namespace SettingsApplication
                 {
                     textBoxFolderPath.Text = folderBrowserDialog.SelectedPath;
                 }
+            }
+        }
+
+        private bool ValidateInputs(string monitorIntervalText, string numberOfRunsText, string serviceName)
+        {
+            if (!Validation.CheckValidation(monitorIntervalText, numberOfRunsText, serviceName, textBoxFolderPath, textBoxUrl, _logger))
+            {
+                return false;
+            }
+
+            if (!int.TryParse(monitorIntervalText, out _))
+            {
+                _logger.Error($"Monitor Interval should be a valid integer. {monitorIntervalText} is not valid.");
+                return false;
+            }
+
+            if (!int.TryParse(numberOfRunsText, out _))
+            {
+                _logger.Error($"Number of Runs should be a valid integer. {numberOfRunsText} is not valid.");
+                return false;
+            }
+
+            return true;
+        }
+
+        private ServiceSettings CreateServiceSettings(string serviceName, string monitorIntervalText, string numberOfRunsText, string logLevel)
+        {
+            var monitorInterval = int.Parse(monitorIntervalText);
+            var numberOfRuns = int.Parse(numberOfRunsText);
+
+            var serviceSettings = new ServiceSettings
+            {
+                ServiceName = serviceName,
+                MonitorInterval = monitorInterval,
+                NumberOfRuns = numberOfRuns,
+                LogLevel = logLevel
+            };
+
+            if (serviceName.Contains("Service"))
+            {
+                serviceSettings.FolderPath = textBoxFolderPath.Text;
+            }
+            else if (serviceName.Contains("WebApi"))
+            {
+                serviceSettings.Url = textBoxUrl.Text;
+            }
+
+            return serviceSettings;
+        }
+
+        private void SaveSettings(string serviceName, ServiceSettings serviceSettings)
+        {
+            _settingsSaver.SaveSettings(serviceName, serviceSettings);
+
+            if (serviceName.Contains("Service"))
+            {
+                string appConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"..\{serviceName}\App.config");
+                _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
             }
         }
     }
