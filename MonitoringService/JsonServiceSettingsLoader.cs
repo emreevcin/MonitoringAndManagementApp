@@ -14,16 +14,16 @@ namespace MonitoringService
             _logCatcher = logger;
         }
 
-        public Dictionary<string, Dictionary<string, ServiceSettings>> LoadServiceSettings()
+        public Dictionary<string, Dictionary<string, ServiceSettingsDto>> LoadServiceSettings()
         {
             try
             {
-                return JsonHelper.LoadAllServiceSettings();
+                return SettingsJsonHelper.LoadAllServiceSettings();
             }
             catch (Exception ex)
             {
                 _logCatcher.Error($"Error loading service settings: {ex.Message}");
-                return new Dictionary<string, Dictionary<string, ServiceSettings>>();
+                return new Dictionary<string, Dictionary<string, ServiceSettingsDto>>();
             }
         }
     }

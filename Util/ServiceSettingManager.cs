@@ -1,5 +1,4 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
 using Serilog;
 
 namespace Util
@@ -19,26 +18,36 @@ namespace Util
             return GetServiceSetting(serviceName, "Url");
         }
 
+        private static string GetCategoryName(string serviceName)
+        {
+            return serviceName.Contains("Service") ? "Services" : "WebApis";
+        }
+
         private static string GetServiceSetting(string serviceName, string propertyName)
         {
             try
             {
-                JObject allSettings = settingsRepository.LoadAllSettings();
+                var allSettings = settingsRepository.LoadAllSettings();
                 if (allSettings != null)
                 {
-                    if (allSettings.ContainsKey("Services") && allSettings["Services"][serviceName] != null)
+                    string categoryName = GetCategoryName(serviceName);
+                    if (allSettings.ContainsKey(categoryName) && allSettings[categoryName].ContainsKey(serviceName))
                     {
-                        var serviceSettings = allSettings["Services"][serviceName];
-                        if (serviceSettings[propertyName] != null)
+                        var serviceSettings = allSettings[categoryName][serviceName];
+                        var property = serviceSettings.GetType().GetProperty(propertyName);
+                        if (property != null)
                         {
-                            return serviceSettings[propertyName].ToString();
+                            return property.GetValue(serviceSettings)?.ToString();
                         }
                         else
                         {
                             logger.Warning($"Property '{propertyName}' not found for service '{serviceName}'.");
                         }
                     }
-                    logger.Warning($"Service {serviceName} or property {propertyName} not found.");
+                    else
+                    {
+                        logger.Warning($"Service {serviceName} or property {propertyName} not found.");
+                    }
                 }
                 else
                 {

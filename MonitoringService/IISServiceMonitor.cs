@@ -14,7 +14,7 @@ namespace MonitoringService
             _logCatcher = logCatcher;
         }
 
-        public void MonitorService(string serviceName, ServiceSettings settings)
+        public void MonitorService(string serviceName, ServiceSettingsDto settings)
         {
             try
             {

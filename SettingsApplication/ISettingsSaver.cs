@@ -4,6 +4,6 @@ namespace SettingsApplication
 {
     public interface ISettingsSaver
     {
-        void SaveSettings(string serviceName, ServiceSettings settings);
+        void SaveSettings(string serviceName, ServiceSettingsDto settings);
     }
 }

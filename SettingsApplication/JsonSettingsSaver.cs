@@ -4,9 +4,9 @@ namespace SettingsApplication
 {
     internal class JsonSettingsSaver : ISettingsSaver
     {
-        public void SaveSettings(string serviceName, ServiceSettings settings)
+        public void SaveSettings(string serviceName, ServiceSettingsDto settings)
         {
-            JsonHelper.SaveServiceSettings(serviceName, settings);
+            SettingsJsonHelper.SaveServiceSettings(serviceName, settings);
         }
     }
 }

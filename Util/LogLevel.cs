@@ -14,7 +14,7 @@ namespace Util
             string defaultLogLevel = "information"; 
             try
             {
-                dynamic serviceSettings = JsonHelper.LoadServiceSettings(serviceName);
+                dynamic serviceSettings = SettingsJsonHelper.LoadServiceSettings(serviceName);
                 if (serviceSettings != null && serviceSettings.LogLevel != null)
                 {
                     return serviceSettings.LogLevel;

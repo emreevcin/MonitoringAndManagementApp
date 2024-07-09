@@ -1,7 +1,6 @@
 ﻿using Serilog;
 using System;
 using System.IO;
-using System.ServiceProcess;
 using System.Windows.Forms;
 using Util;
 
@@ -41,7 +40,7 @@ namespace SettingsApplication
         {
             try
             {
-                ServiceSettings settings = JsonHelper.LoadServiceSettings(serviceName);
+                ServiceSettingsDto settings = SettingsJsonHelper.LoadServiceSettings(serviceName);
 
                 if (settings != null)
                 {
@@ -65,6 +64,17 @@ namespace SettingsApplication
             }
         }
 
+        private void SaveSettings(string serviceName, ServiceSettingsDto serviceSettings)
+        {
+            _settingsSaver.SaveSettings(serviceName, serviceSettings);
+
+            if (serviceName.Contains("Service"))
+            {
+                string appConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"..\{serviceName}\App.config");
+                _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
+            }
+        }
+
 
 
         private void UpdateVisibility(string serviceName)
@@ -79,7 +89,7 @@ namespace SettingsApplication
             textBoxUrl.Visible = isWebApi;
         }
 
-        private void UpdateFields(string serviceName, ServiceSettings settings)
+        private void UpdateFields(string serviceName, ServiceSettingsDto settings)
         {
             if (serviceName.Contains("Service"))
             {
@@ -169,12 +179,12 @@ namespace SettingsApplication
             return true;
         }
 
-        private ServiceSettings CreateServiceSettings(string serviceName, string monitorIntervalText, string numberOfRunsText, string logLevel)
+        private ServiceSettingsDto CreateServiceSettings(string serviceName, string monitorIntervalText, string numberOfRunsText, string logLevel)
         {
             var monitorInterval = int.Parse(monitorIntervalText);
             var numberOfRuns = int.Parse(numberOfRunsText);
 
-            var serviceSettings = new ServiceSettings
+            var serviceSettings = new ServiceSettingsDto
             {
                 ServiceName = serviceName,
                 MonitorInterval = monitorInterval,
@@ -192,17 +202,6 @@ namespace SettingsApplication
             }
 
             return serviceSettings;
-        }
-
-        private void SaveSettings(string serviceName, ServiceSettings serviceSettings)
-        {
-            _settingsSaver.SaveSettings(serviceName, serviceSettings);
-
-            if (serviceName.Contains("Service"))
-            {
-                string appConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"..\{serviceName}\App.config");
-                _configUpdater.UpdateAppConfigLogLevel(serviceName, serviceSettings.LogLevel, appConfigPath);
-            }
         }
     }
 }

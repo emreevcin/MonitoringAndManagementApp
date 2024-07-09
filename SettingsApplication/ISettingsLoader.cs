@@ -4,6 +4,6 @@ namespace SettingsApplication
 {
     public interface ISettingsLoader
     {
-        ServiceSettings LoadSettings(string serviceName);
+        ServiceSettingsDto LoadSettings(string serviceName);
     }
 }

@@ -51,7 +51,7 @@ namespace MonitoringService
                 foreach (var serviceEntry in servicesInCategory)
                 {
                     string serviceName = serviceEntry.Key;
-                    ServiceSettings settings = serviceEntry.Value;
+                    ServiceSettingsDto settings = serviceEntry.Value;
 
                     Timer timer = new Timer
                     {

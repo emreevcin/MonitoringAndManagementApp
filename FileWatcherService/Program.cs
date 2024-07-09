@@ -1,9 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using Serilog;
-using Serilog.Events;
-using System;
+﻿using Serilog;
 using System.ServiceProcess;
-using System.Timers;
 using Util;
 
 namespace FileWatcherService
@@ -11,7 +7,7 @@ namespace FileWatcherService
     internal static class Program
     {
 
-        private static string serviceName = "FileWatcherService";
+        private readonly static string _serviceName = "FileWatcherService";
 
         /// <summary>
         /// The main entry point for the application.
@@ -19,10 +15,10 @@ namespace FileWatcherService
         static void Main()
         {
             ServiceBase[] ServicesToRun;
-            string path = ServiceSettingManager.GetServicePath(serviceName);
 
-            ILogger configuration = ConfigureLogger();
-            
+            var configuration = ConfigureLogger();
+            string path = ServiceSettingManager.GetServicePath(_serviceName);
+
             ServicesToRun = new ServiceBase[]
             {
                 new FileWatcherService(configuration,path)
@@ -32,10 +28,14 @@ namespace FileWatcherService
 
         private static ILogger ConfigureLogger()
         {
-            string logLevelString = LogLevel.GetLogLevel(serviceName);
-            LogEventLevel logLevel = LogLevel.ConvertToLogEventLevel(logLevelString);
+            string logLevelString = LogLevel.GetLogLevel(_serviceName);
+            var logLevel = LogLevel.ConvertToLogEventLevel(logLevelString);
 
-            return new LoggerConfiguration().ReadFrom.AppSettings().MinimumLevel.Is(logLevel).Enrich.FromLogContext().CreateLogger();
+            return new LoggerConfiguration()
+                .ReadFrom.AppSettings()
+                .MinimumLevel.Is(logLevel)
+                .Enrich.FromLogContext()
+                .CreateLogger();
         }
     }
 }

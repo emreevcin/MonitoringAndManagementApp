@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.ServiceProcess;
 using Serilog;
 
@@ -38,36 +37,28 @@ namespace FileWatcherService
 
         private void ConfigureFileSystemWatcher()
         {
-            _watcher = new FileSystemWatcher();
-            _watcher.Path = _path;
-            _watcher.IncludeSubdirectories = true; 
-            _watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            _watcher.Filter = "*.*";
+            _watcher = new FileSystemWatcher
+            {
+                Path = _path,
+                IncludeSubdirectories = true,
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
+                Filter = "*.*"
+            };
 
-            _watcher.Changed += new FileSystemEventHandler(OnChanged);
-            _watcher.Created += new FileSystemEventHandler(OnCreated);
-            _watcher.Deleted += new FileSystemEventHandler(OnDeleted);
-            _watcher.Renamed += new RenamedEventHandler(OnRenamed);
+            _watcher.Changed += OnFileSystemEvent;
+            _watcher.Created += OnFileSystemEvent;
+            _watcher.Deleted += OnFileSystemEvent;
+            _watcher.Renamed += OnRenamed;
 
             _watcher.EnableRaisingEvents = true;
         }
 
-        private void OnChanged(object source, FileSystemEventArgs e)
+        private void OnFileSystemEvent(object sender, FileSystemEventArgs e)
         {
-            _logCatcher.Information($"File: {e.FullPath} {e.ChangeType}");
+            _logCatcher.Information($"{e.ChangeType}: {e.Name}");
         }
 
-        private void OnCreated(object source, FileSystemEventArgs e)
-        {
-            _logCatcher.Information($"Created: File {e.FullPath} {e.ChangeType}");
-        }
-
-        private void OnDeleted(object source, FileSystemEventArgs e)
-        {
-            _logCatcher.Information($"Deleted: File {e.FullPath} {e.ChangeType}");
-        }
-
-        private void OnRenamed(object source, RenamedEventArgs e)
+        private void OnRenamed(object sender, RenamedEventArgs e)
         {
             _logCatcher.Information($"File: {e.OldFullPath} renamed to {e.FullPath}");
         }

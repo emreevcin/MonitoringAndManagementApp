@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
 
 namespace Util
 {
     public interface ISettingsRepository
     {
-        JObject LoadAllSettings();
-        void SaveAllSettings(dynamic allSettings);
+        Dictionary<string, Dictionary<string, ServiceSettingsDto>> LoadAllSettings();
+        void SaveAllSettings(Dictionary<string, Dictionary<string, ServiceSettingsDto>> allSettings);
     }
 }

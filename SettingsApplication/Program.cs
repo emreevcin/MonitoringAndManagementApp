@@ -15,7 +15,9 @@ namespace SettingsApplication
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var logCatcher = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
+            var logCatcher = new LoggerConfiguration()
+                .ReadFrom.AppSettings()
+                .CreateLogger();
 
             var settingsLoader = new JsonSettingsLoader();
             var settingsSaver = new JsonSettingsSaver();

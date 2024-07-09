@@ -4,6 +4,6 @@ namespace MonitoringService
 {
     public interface IServiceMonitor
     {
-        void MonitorService(string serviceName, ServiceSettings settings);
+        void MonitorService(string serviceName, ServiceSettingsDto settings);
     }
 }

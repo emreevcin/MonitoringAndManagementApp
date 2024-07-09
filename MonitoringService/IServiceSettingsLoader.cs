@@ -5,6 +5,6 @@ namespace MonitoringService
 {
     public interface IServiceSettingsLoader
     {
-        Dictionary<string, Dictionary<string, ServiceSettings>> LoadServiceSettings();
+        Dictionary<string, Dictionary<string, ServiceSettingsDto>> LoadServiceSettings();
     }
 }

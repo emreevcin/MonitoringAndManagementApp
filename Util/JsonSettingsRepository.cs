@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Util
 {
@@ -15,18 +15,18 @@ namespace Util
         {
             settingsFilePath = filePath;
         }
-        public JObject LoadAllSettings()
+        public Dictionary<string, Dictionary<string, ServiceSettingsDto>> LoadAllSettings()
         {
             try
             {
                 if (File.Exists(settingsFilePath))
                 {
                     string json = File.ReadAllText(settingsFilePath);
-                    return JObject.Parse(json);
+                    return JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, ServiceSettingsDto>>>(json);
                 }
                 else
                 {
-                    Log.Warning($"Settings file not found at {settingsFilePath}");
+                    logger.Warning($"Settings file not found at {settingsFilePath}");
                     return HandleMissingSettingsFile();
                 }
             }
@@ -37,7 +37,7 @@ namespace Util
             }
         }
 
-        public void SaveAllSettings(dynamic allSettings)
+        public void SaveAllSettings(Dictionary<string, Dictionary<string, ServiceSettingsDto>> allSettings)
         {
             try
             {
@@ -51,11 +51,11 @@ namespace Util
             }
         }
 
-        private dynamic HandleMissingSettingsFile()
+        private Dictionary<string, Dictionary<string, ServiceSettingsDto>> HandleMissingSettingsFile()
         {
-            var defaultSettings = new JObject();
+            var defaultSettings = new Dictionary<string, Dictionary<string, ServiceSettingsDto>>();
             SaveAllSettings(defaultSettings);
-            Log.Warning($"Created default settings file at {settingsFilePath}");
+            logger.Warning($"Created default settings file at {settingsFilePath}");
             return defaultSettings;
         }
     }

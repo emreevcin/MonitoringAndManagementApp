@@ -4,9 +4,9 @@ namespace SettingsApplication
 {
     internal class JsonSettingsLoader : ISettingsLoader
     {
-        public ServiceSettings LoadSettings(string serviceName)
+        public ServiceSettingsDto LoadSettings(string serviceName)
         {
-            return JsonHelper.LoadServiceSettings(serviceName);
+            return SettingsJsonHelper.LoadServiceSettings(serviceName);
         }
     }
 }
