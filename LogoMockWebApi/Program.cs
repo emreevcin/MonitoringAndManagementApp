@@ -12,11 +12,12 @@ namespace LogoMockWebApi
         {
             try
             {
+                Log.Information("Starting web host.");
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Host terminated unexpectedly");
+                Log.Fatal($"Host terminated unexpectedly. - {ex.Message}");
             }
             finally
             {
@@ -26,7 +27,7 @@ namespace LogoMockWebApi
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseSerilog() 
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

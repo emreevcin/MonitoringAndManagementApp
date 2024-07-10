@@ -31,7 +31,10 @@ namespace Util
 
                 case "Util":
                     _logger = new LoggerConfiguration()
-                    .WriteTo.File(Constants.logFilePath, rollingInterval: RollingInterval.Day)
+                    .WriteTo.File(
+                        path: Constants.logFilePath,
+                        rollingInterval: RollingInterval.Day, 
+                        shared: true)
                     .MinimumLevel.Warning()
                     .Enrich.FromLogContext()
                     .CreateLogger();

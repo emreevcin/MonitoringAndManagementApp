@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileWatcherService", "FileW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "Util\Util.csproj", "{D7367177-AF14-4620-8F7E-780E2C1B5E6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogoMockWebApi", "LogoMockWebApi\LogoMockWebApi.csproj", "{8E9E59BA-4CA7-47D5-8314-880A712E8E17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogoMockWebApi", "LogoMockWebApi\LogoMockWebApi.csproj", "{8E9E59BA-4CA7-47D5-8314-880A712E8E17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

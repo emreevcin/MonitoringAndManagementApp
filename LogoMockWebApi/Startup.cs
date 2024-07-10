@@ -33,8 +33,17 @@ namespace LogoMockWebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
         {
+            if (appLifetime != null)
+            {
+                appLifetime.ApplicationStopping.Register(OnApplicationStopping);
+            }
+            else
+            {
+                Log.Warning("IHostApplicationLifetime is null, some functionalities may not work correctly.");
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -65,6 +74,12 @@ namespace LogoMockWebApi
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void OnApplicationStopping()
+        {
+            Log.Information("Application is stopping. Host is shutting down.");
+            Log.CloseAndFlush();
         }
     }
 }
