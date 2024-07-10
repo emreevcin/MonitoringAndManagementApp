@@ -16,7 +16,7 @@ namespace MonitoringService
 
         public void MonitorService(ServiceSettingsDto settings)
         {
-            LogManager.CheckServiceNameAndLogError(settings);
+            LoggerUtil.CheckServiceNameAndLogError(settings);
 
             string serviceName = settings.ServiceName;
                 

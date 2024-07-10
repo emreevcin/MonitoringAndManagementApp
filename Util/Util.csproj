@@ -118,6 +118,9 @@
     <Reference Include="Serilog.Settings.AppSettings, Version=3.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Settings.AppSettings.3.0.0\lib\net471\Serilog.Settings.AppSettings.dll</HintPath>
     </Reference>
+    <Reference Include="Serilog.Settings.Configuration, Version=8.0.1.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Settings.Configuration.8.0.1\lib\net462\Serilog.Settings.Configuration.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog.Sinks.File, Version=6.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Sinks.File.6.0.0\lib\net471\Serilog.Sinks.File.dll</HintPath>
     </Reference>
@@ -172,10 +175,10 @@
     <Compile Include="Configs\AppConfigUpdater.cs" />
     <Compile Include="Configs\IConfigUpdater.cs" />
     <Compile Include="Generics\Constants.cs" />
+    <Compile Include="LoggerUtil.cs" />
     <Compile Include="Repositories\ISettingsRepository.cs" />
     <Compile Include="Helpers\SettingsHelper.cs" />
     <Compile Include="Repositories\JsonSettingsRepository.cs" />
-    <Compile Include="LogManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\SerilogHelper.cs" />
     <Compile Include="Settings\ServiceSettingManager.cs" />

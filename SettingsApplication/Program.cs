@@ -1,6 +1,6 @@
-﻿using Serilog;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using Util;
 
 namespace SettingsApplication
 {
@@ -15,9 +15,9 @@ namespace SettingsApplication
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var logCatcher = new LoggerConfiguration()
-                .ReadFrom.AppSettings()
-                .CreateLogger();
+            var logCatcher = LoggerUtil.ConfigureLogger("App.Config");
+
+            // var logCatcher = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
 
             Application.Run(new SettingsForm(logCatcher));
         }

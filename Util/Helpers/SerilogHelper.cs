@@ -1,6 +1,5 @@
 ﻿using Serilog;
 
-
 namespace Util
 {
     public static class SerilogHelper
@@ -9,11 +8,7 @@ namespace Util
 
         static SerilogHelper()
         {
-            logger = new LoggerConfiguration()
-                .WriteTo.File(Constants.logFilePath, rollingInterval: RollingInterval.Day)
-                .MinimumLevel.Warning()
-                .Enrich.FromLogContext()
-                .CreateLogger();
+            logger = LoggerUtil.ConfigureLogger("Util");
         }
 
         public static ILogger GetLogger()

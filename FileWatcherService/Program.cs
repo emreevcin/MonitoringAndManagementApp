@@ -1,5 +1,4 @@
-﻿using Serilog;
-using System.ServiceProcess;
+﻿using System.ServiceProcess;
 using Util;
 
 namespace FileWatcherService
@@ -16,7 +15,7 @@ namespace FileWatcherService
         {
             ServiceBase[] ServicesToRun;
 
-            var configuration = ConfigureLogger();
+            var configuration = LoggerUtil.ConfigureLogger("App.Config", LoggerUtil.GetLogLevel(_serviceName));
             string path = ServiceSettingManager.GetServicePath(_serviceName);
 
             ServicesToRun = new ServiceBase[]
@@ -24,17 +23,6 @@ namespace FileWatcherService
                 new FileWatcherService(configuration,path)
             };
             ServiceBase.Run(ServicesToRun);
-        }
-
-        private static ILogger ConfigureLogger()
-        {
-            var logLevel = LogManager.GetLogLevel(_serviceName);
-
-            return new LoggerConfiguration()
-                .ReadFrom.AppSettings()
-                .MinimumLevel.Is(logLevel)
-                .Enrich.FromLogContext()
-                .CreateLogger();
         }
     }
 }

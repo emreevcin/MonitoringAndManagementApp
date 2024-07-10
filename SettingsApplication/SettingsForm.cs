@@ -18,7 +18,7 @@ namespace SettingsApplication
 
             InitializeComponent();
 
-            comboBoxService.Items.AddRange(new object[] { "FileWatcherService", "LogoMockWebApi" });
+            comboBoxService.Items.AddRange(new object[] { "FileWatcherService", "LogoWebApi" });
             comboBoxService.SelectedIndex = 0;
 
             LoadSettings(comboBoxService.Text);
@@ -62,7 +62,7 @@ namespace SettingsApplication
 
         private void SaveSettings(ServiceSettingsDto serviceSettings)
         {
-            LogManager.CheckServiceNameAndLogError(serviceSettings);
+            LoggerUtil.CheckServiceNameAndLogError(serviceSettings);
 
             string serviceName = serviceSettings.ServiceName;
 
@@ -92,7 +92,7 @@ namespace SettingsApplication
 
         private void UpdateFields(ServiceSettingsDto settings)
         {
-            LogManager.CheckServiceNameAndLogError(settings);
+            LoggerUtil.CheckServiceNameAndLogError(settings);
 
             string serviceName = settings.ServiceName;
 
