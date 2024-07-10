@@ -175,13 +175,13 @@
     <Compile Include="Configs\AppConfigUpdater.cs" />
     <Compile Include="Configs\IConfigUpdater.cs" />
     <Compile Include="Generics\Constants.cs" />
-    <Compile Include="LoggerUtil.cs" />
+    <Compile Include="Generics\Enums.cs" />
+    <Compile Include="Generics\LoggerUtil.cs" />
     <Compile Include="Repositories\ISettingsRepository.cs" />
     <Compile Include="Helpers\SettingsHelper.cs" />
     <Compile Include="Repositories\JsonSettingsRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\SerilogHelper.cs" />
-    <Compile Include="Settings\ServiceSettingManager.cs" />
     <Compile Include="DTOs\ServiceSettingsDto.cs" />
   </ItemGroup>
   <ItemGroup>

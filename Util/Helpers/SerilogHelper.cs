@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using Util.Generics;
 
 namespace Util
 {
@@ -8,7 +9,7 @@ namespace Util
 
         static SerilogHelper()
         {
-            logger = LoggerUtil.ConfigureLogger("Util");
+            logger = LoggerUtil.ConfigureLogger(LoggerConfigurationType.Util);
         }
 
         public static ILogger GetLogger()

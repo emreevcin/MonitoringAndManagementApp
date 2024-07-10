@@ -18,7 +18,7 @@ namespace MonitoringService
         {
             try
             {
-                LoggerUtil.CheckServiceNameAndLogError(settings);
+                SettingsHelper.CheckServiceNameAndLogError(settings);
 
                 string serviceName = settings.ServiceName;
 

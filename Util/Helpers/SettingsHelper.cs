@@ -31,7 +31,7 @@ namespace Util
                 var allSettings = _settingsRepository.LoadAllSettings();
                 if (allSettings != null)
                 {
-                    string categoryName = ServiceSettingManager.GetCategoryName(serviceKey);
+                    string categoryName = GetCategoryName(serviceKey);
                     if (allSettings.ContainsKey(categoryName) && allSettings[categoryName].ContainsKey(serviceKey))
                     {
                         return allSettings[categoryName][serviceKey];
@@ -71,9 +71,18 @@ namespace Util
             }
         }
 
+        public static void CheckServiceNameAndLogError(ServiceSettingsDto serviceSettings)
+        {
+            if (string.IsNullOrEmpty(serviceSettings.ServiceName))
+            {
+                _logger.Error("Service name cannot be null or empty.");
+                return;
+            }
+        }
+
         private static void UpdateServiceSettings(Dictionary<string, Dictionary<string, ServiceSettingsDto>> allSettings, string serviceKey, ServiceSettingsDto serviceSettings)
         {
-            string categoryName = ServiceSettingManager.GetCategoryName(serviceKey);
+            string categoryName = GetCategoryName(serviceKey);
             if (!allSettings.ContainsKey(categoryName))
             {
                 allSettings[categoryName] = new Dictionary<string, ServiceSettingsDto>();
@@ -81,5 +90,10 @@ namespace Util
             }
             allSettings[categoryName][serviceKey] = serviceSettings;
         }
+        internal static string GetCategoryName(string serviceName)
+        {
+            return serviceName.Contains("Service") ? "Services" : "WebApis";
+        }
+
     }
 }

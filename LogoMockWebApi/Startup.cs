@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
+using System.Reflection;
 
 namespace LogoMockWebApi
 {
@@ -21,13 +22,23 @@ namespace LogoMockWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddEndpointsApiExplorer();
+
 
             // Configure Swagger/OpenAPI
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "LogoMockWebApi API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                    Title = "LogoMockWebApi API",
+                    Description = "A simple mock API for Logo Software.",
+                    Version = "v1" });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
+
+            services.AddControllers();
 
             // Other services configuration can be added here as needed
         }
@@ -54,8 +65,6 @@ namespace LogoMockWebApi
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();
@@ -65,6 +74,7 @@ namespace LogoMockWebApi
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "LogoMockWebApi V1");
+                c.DocumentTitle = "LogoMockWebApi API";
             });
 
             // Serilog request logging middleware

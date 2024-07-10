@@ -1,7 +1,7 @@
-﻿using Serilog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ServiceProcess;
 using Util;
+using Util.Generics;
 
 namespace MonitoringService
 {
@@ -15,8 +15,7 @@ namespace MonitoringService
 
             ServiceBase[] ServicesToRun;
 
-            //var logCatcher = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
-            var logCatcher = LoggerUtil.ConfigureLogger("App.Config");
+            var logCatcher = LoggerUtil.ConfigureLogger(LoggerConfigurationType.AppConfig);
             var serviceMonitors = new Dictionary<string, IServiceMonitor>
             {
                 { "Services", new WindowsServiceMonitor(logCatcher) },

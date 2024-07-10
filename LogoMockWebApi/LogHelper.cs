@@ -1,5 +1,6 @@
 ﻿using Util;
 using Serilog;
+using Util.Generics;
 
 namespace LogoMockWebApi
 {
@@ -17,11 +18,16 @@ namespace LogoMockWebApi
 
         public static void ConfigureLogger()
         {
-            var logLevel = LoggerUtil.GetLogLevel(_serviceName);
 
-            var loggerConfig = LoggerUtil.ConfigureLogger("WebApi", logLevel, Configuration);
+            var serviceSettings = SettingsHelper.LoadServiceSettings(_serviceName);
+            var logLevel = serviceSettings.LogLevel;
+            var url = serviceSettings.Url;
+
+            var loggerConfig = LoggerUtil.ConfigureLogger(LoggerConfigurationType.WebApi, logLevel, Configuration);
 
             Log.Logger = loggerConfig;
+
+            Log.Information($"Logger configured for {_serviceName} at {url} with log level {logLevel}");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using Util;
+using Util.Generics;
 
 namespace SettingsApplication
 {
@@ -15,9 +16,7 @@ namespace SettingsApplication
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var logCatcher = LoggerUtil.ConfigureLogger("App.Config");
-
-            // var logCatcher = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
+            var logCatcher = LoggerUtil.ConfigureLogger(LoggerConfigurationType.AppConfig);
 
             Application.Run(new SettingsForm(logCatcher));
         }

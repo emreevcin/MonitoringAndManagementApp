@@ -62,7 +62,7 @@ namespace SettingsApplication
 
         private void SaveSettings(ServiceSettingsDto serviceSettings)
         {
-            LoggerUtil.CheckServiceNameAndLogError(serviceSettings);
+            SettingsHelper.CheckServiceNameAndLogError(serviceSettings);
 
             string serviceName = serviceSettings.ServiceName;
 
@@ -92,7 +92,7 @@ namespace SettingsApplication
 
         private void UpdateFields(ServiceSettingsDto settings)
         {
-            LoggerUtil.CheckServiceNameAndLogError(settings);
+            SettingsHelper.CheckServiceNameAndLogError(settings);
 
             string serviceName = settings.ServiceName;
 

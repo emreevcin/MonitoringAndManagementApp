@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace LogoMockWebApi
 {
@@ -31,7 +32,7 @@ namespace LogoMockWebApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://localhost:121");
                 });
+
     }
 }

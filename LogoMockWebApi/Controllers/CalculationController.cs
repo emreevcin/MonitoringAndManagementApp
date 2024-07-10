@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using Serilog;
 
 namespace LogoMockWebApi.Controllers
@@ -9,8 +8,25 @@ namespace LogoMockWebApi.Controllers
     [ApiController]
     public class CalculationController : ControllerBase
     {
-        // GET: api/calculation/sum?x=5&y=10
+        /// <summary>
+        /// Calculates the sum of two integers.
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET /api/calculation/sum?x=5&y=10
+        ///     {
+        ///        "x": 5,
+        ///        "y": 10
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="x">First integer.</param>
+        /// <param name="y">Second integer.</param>
+        /// <returns>The sum of x and y.</returns>
         [HttpGet("sum")]
+        [SwaggerOperation(Summary = "Calculate sum of two integers", Description = "Calculates the sum of two integers.")]
+        [SwaggerResponse(200, "Returns the sum of the two integers.", typeof(int))]
         public IActionResult Sum(int x, int y)
         {
             int result = x + y;

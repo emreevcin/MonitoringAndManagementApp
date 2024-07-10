@@ -1,5 +1,6 @@
 ﻿using System.ServiceProcess;
 using Util;
+using Util.Generics;
 
 namespace FileWatcherService
 {
@@ -15,8 +16,10 @@ namespace FileWatcherService
         {
             ServiceBase[] ServicesToRun;
 
-            var configuration = LoggerUtil.ConfigureLogger("App.Config", LoggerUtil.GetLogLevel(_serviceName));
-            string path = ServiceSettingManager.GetServicePath(_serviceName);
+            var serviceSettings = SettingsHelper.LoadServiceSettings(_serviceName);
+
+            var configuration = LoggerUtil.ConfigureLogger(LoggerConfigurationType.AppConfig, serviceSettings.LogLevel);
+            string path = serviceSettings.FolderPath;
 
             ServicesToRun = new ServiceBase[]
             {
