@@ -9,9 +9,9 @@ namespace Util
             ServiceName = serviceName;
             MonitorInterval = Constants.DefaultMonitorInterval;
             NumberOfRuns = Constants.DefaultNumberOfRuns;
-            LogLevel = Constants.DefaultLogLevel.ToString();
+            LogLevel = Constants.DefaultLogLevel;
             Url = serviceName.Contains("WebApi") ? Constants.DefaultWebApiUrl : null;
-            FolderPath = serviceName.Contains("Service") ? $"{Constants.DefaultFolderPath}\\{serviceName}" : null;
+            FolderPath = serviceName.Contains("Service") ? $"{Constants.DefaultFolderPath}" : null;
         }
 
         public ServiceSettingsDto(string serviceName, int monitorInterval, int numberOfRuns, LogEventLevel logLevel, string url, string folderPath)
@@ -19,7 +19,7 @@ namespace Util
             ServiceName = serviceName;
             MonitorInterval = monitorInterval;
             NumberOfRuns = numberOfRuns;
-            LogLevel = logLevel.ToString();
+            LogLevel = logLevel;
             Url = url;
             FolderPath = folderPath;
         }
@@ -31,7 +31,7 @@ namespace Util
         public string ServiceName { get; set; }
         public int MonitorInterval { get; set; }
         public int NumberOfRuns { get; set; }
-        public string LogLevel { get; set; }
+        public LogEventLevel LogLevel { get; set; }
         public string Url { get; set; }
         public string FolderPath { get; set; }
     }

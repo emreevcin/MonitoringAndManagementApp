@@ -16,8 +16,7 @@ namespace LogoMockWebApi
 
         public static void ConfigureLogger()
         {
-            var logLevel = Util.LogLevel.GetLogEventLevel(_serviceName);
-
+            var logLevel = Util.LogManager.GetLogLevel(_serviceName);
 
             var loggerConfig = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)

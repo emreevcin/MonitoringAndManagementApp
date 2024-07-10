@@ -34,7 +34,7 @@ namespace MonitoringService
         {
             try
             {
-                var servicesToMonitor = SettingsJsonHelper.LoadAllServiceSettings();
+                var servicesToMonitor = SettingsHelper.LoadAllServiceSettings();
                 foreach (var categoryEntry in servicesToMonitor)
                 {
                     string categoryName = categoryEntry.Key;
@@ -58,7 +58,7 @@ namespace MonitoringService
                             Interval = settings.MonitorInterval * 1000,
                             Enabled = true
                         };
-                        timer.Elapsed += (sender, e) => serviceMonitor.MonitorService(serviceName, settings);
+                        timer.Elapsed += (sender, e) => serviceMonitor.MonitorService(settings);
                         timer.Start();
                     }
                 }

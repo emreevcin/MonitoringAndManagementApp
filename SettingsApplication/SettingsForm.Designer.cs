@@ -78,7 +78,7 @@
             // comboBoxLogLevel
             this.comboBoxLogLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxLogLevel.FormattingEnabled = true;
-            this.comboBoxLogLevel.Items.AddRange(new object[] { "Debug", "Info", "Warning", "Error", "Fatal" });
+            this.comboBoxLogLevel.Items.AddRange(new object[] { "Debug", "Information", "Warning", "Error", "Fatal" });
             this.comboBoxLogLevel.Location = new System.Drawing.Point(160, 150);
             this.comboBoxLogLevel.Name = "comboBoxLogLevel";
             this.comboBoxLogLevel.Size = new System.Drawing.Size(100, 21);

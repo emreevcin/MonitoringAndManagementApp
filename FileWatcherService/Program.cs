@@ -28,7 +28,7 @@ namespace FileWatcherService
 
         private static ILogger ConfigureLogger()
         {
-            var logLevel = LogLevel.GetLogEventLevel(_serviceName);
+            var logLevel = LogManager.GetLogLevel(_serviceName);
 
             return new LoggerConfiguration()
                 .ReadFrom.AppSettings()

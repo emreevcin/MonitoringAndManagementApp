@@ -1,11 +1,13 @@
-﻿using System.Configuration;
+﻿using Serilog.Events;
+using System.Configuration;
+using System;
 
 
 namespace Util.AppConfigSettings
 {
     public class AppConfigUpdater : IConfigUpdater
     {
-        public void UpdateAppConfigLogLevel(string serviceName, string logLevel, string appConfigPath)
+        public void UpdateAppConfigLogLevel(string serviceName, LogEventLevel logLevel, string appConfigPath)
         {
             var map = new ExeConfigurationFileMap { ExeConfigFilename = appConfigPath };
             var config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
@@ -14,11 +16,11 @@ namespace Util.AppConfigSettings
 
             if (config.AppSettings.Settings[logLevelKey] != null)
             {
-                config.AppSettings.Settings[logLevelKey].Value = logLevel;
+                config.AppSettings.Settings[logLevelKey].Value = Enum.GetName(typeof(LogEventLevel),logLevel);
             }
             else
             {
-                config.AppSettings.Settings.Add(logLevelKey, logLevel);
+                config.AppSettings.Settings.Add(logLevelKey, Enum.GetName(typeof(LogEventLevel), logLevel));
             }
 
             config.Save(ConfigurationSaveMode.Modified);

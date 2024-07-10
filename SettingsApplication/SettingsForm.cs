@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using Serilog.Events;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -35,16 +36,16 @@ namespace SettingsApplication
         {
             try
             {
-                ServiceSettingsDto settings = SettingsJsonHelper.LoadServiceSettings(serviceName);
+                ServiceSettingsDto settings = SettingsHelper.LoadServiceSettings(serviceName);
 
                 if (settings != null)
                 {
                     textBoxTimeInterval.Text = settings.MonitorInterval.ToString();
                     textBoxNumberOfRuns.Text = settings.NumberOfRuns.ToString();
-                    comboBoxLogLevel.SelectedItem = settings.LogLevel;
+                    comboBoxLogLevel.SelectedItem = Enum.GetName(typeof(LogEventLevel), settings.LogLevel);
 
                     UpdateVisibility(serviceName);
-                    UpdateFields(serviceName, settings);
+                    UpdateFields(settings);
                 }
                 else
                 {
@@ -59,9 +60,13 @@ namespace SettingsApplication
             }
         }
 
-        private void SaveSettings(string serviceName, ServiceSettingsDto serviceSettings)
+        private void SaveSettings(ServiceSettingsDto serviceSettings)
         {
-            SettingsJsonHelper.SaveServiceSettings(serviceName, serviceSettings);
+            LogManager.CheckServiceNameAndLogError(serviceSettings);
+
+            string serviceName = serviceSettings.ServiceName;
+
+            SettingsHelper.SaveServiceSettings(serviceName, serviceSettings);
 
             if (serviceName.Contains("Service"))
             {
@@ -85,8 +90,12 @@ namespace SettingsApplication
             textBoxUrl.Visible = isWebApi;
         }
 
-        private void UpdateFields(string serviceName, ServiceSettingsDto settings)
+        private void UpdateFields(ServiceSettingsDto settings)
         {
+            LogManager.CheckServiceNameAndLogError(settings);
+
+            string serviceName = settings.ServiceName;
+
             if (serviceName.Contains("Service"))
             {
                 textBoxFolderPath.Text = settings.FolderPath?.ToString();
@@ -110,7 +119,8 @@ namespace SettingsApplication
 
             var monitorIntervalText = textBoxTimeInterval.Text;
             var numberOfRunsText = textBoxNumberOfRuns.Text;
-            var logLevel = comboBoxLogLevel.SelectedItem?.ToString();
+            LogEventLevel logLevel = Constants.DefaultLogLevel;
+            Enum.TryParse(comboBoxLogLevel.SelectedItem?.ToString(), out logLevel);
 
             try
             {
@@ -121,7 +131,7 @@ namespace SettingsApplication
                 }
 
                 var serviceSettings = CreateServiceSettings(serviceName, monitorIntervalText, numberOfRunsText, logLevel);
-                SaveSettings(serviceName, serviceSettings);
+                SaveSettings(serviceSettings);
 
                 _logger.Information("Settings saved successfully!");
                 MessageBox.Show("Settings saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -175,7 +185,7 @@ namespace SettingsApplication
             return true;
         }
 
-        private ServiceSettingsDto CreateServiceSettings(string serviceName, string monitorIntervalText, string numberOfRunsText, string logLevel)
+        private ServiceSettingsDto CreateServiceSettings(string serviceName, string monitorIntervalText, string numberOfRunsText, LogEventLevel logLevel)
         {
             var monitorInterval = int.Parse(monitorIntervalText);
             var numberOfRuns = int.Parse(numberOfRunsText);

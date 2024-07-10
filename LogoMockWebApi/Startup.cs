@@ -29,12 +29,6 @@ namespace LogoMockWebApi
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "LogoMockWebApi API", Version = "v1" });
             });
 
-            // Add hosted service
-            services.AddHostedService<IISServiceWatcher>();
-
-            // Add Serilog request logging middleware
-            services.AddSingleton<RequestLoggingMiddleware>();
-
             // Other services configuration can be added here as needed
         }
 

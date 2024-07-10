@@ -14,59 +14,79 @@ namespace MonitoringService
             _logCatcher = logCatcher;
         }
 
-        public void MonitorService(string serviceName, ServiceSettingsDto settings)
+        public void MonitorService(ServiceSettingsDto settings)
         {
+            LogManager.CheckServiceNameAndLogError(settings);
+
+            string serviceName = settings.ServiceName;
+                
             try
             {
                 using (var serverManager = new ServerManager())
                 {
                     ApplicationPool appPool = serverManager.ApplicationPools[serviceName];
 
-                    if (appPool != null)
-                    {
-                        if (appPool.State == ObjectState.Stopped)
-                        {
-                            _logCatcher.Warning($"{settings.ServiceName} downed. Attempting to restart.");
-
-                            if (settings.NumberOfRuns > 0)
-                            {
-                                appPool.Start();
-                                settings.NumberOfRuns--;
-
-                                if (appPool.State == ObjectState.Started)
-                                {
-                                    _logCatcher.Information($"{settings.ServiceName} started.");
-                                }
-                                else
-                                {
-                                    _logCatcher.Error($"{settings.ServiceName} failed to run.");
-                                }
-                            }
-                            else
-                            {
-                                _logCatcher.Error($"{settings.ServiceName} downed. Maximum restart attempts exceeded.");
-                            }
-                        }
-                        else
-                        {
-                            _logCatcher.Information($"{settings.ServiceName} is running.");
-                        }
-                    }
-                    else
-                    {
-                        _logCatcher.Warning($"Application pool '{serviceName}' not found.");
-                    }
+                    CheckAndRestartAppPool(appPool, settings, serviceName);
                 }
-
             }
             catch (InvalidOperationException ex)
             {
-                _logCatcher.Error($"Invalid operation when checking {settings.ServiceName}: {ex.Message}");
+                _logCatcher.Error($"Invalid operation when checking {serviceName}: {ex.Message}");
             }
             catch (Exception ex)
             {
-                _logCatcher.Error($"Error checking {settings.ServiceName}: {ex.Message}");
+                _logCatcher.Error($"Error checking {serviceName}: {ex.Message}");
             }
         }
+
+        public void CheckAndRestartAppPool(ApplicationPool appPool, ServiceSettingsDto settings, string serviceName)
+        {
+            if (appPool == null)
+            {
+                _logCatcher.Warning($"Application pool '{serviceName}' not found.");
+                return;
+            }
+
+            switch (appPool.State)
+            {
+                case ObjectState.Starting:
+                    _logCatcher.Information($"{serviceName} is starting.");
+                    break;
+
+                case ObjectState.Started:
+                    _logCatcher.Information($"{serviceName} is running.");
+                    break;
+
+                case ObjectState.Stopping:
+                    _logCatcher.Information($"{serviceName} is stopping.");
+                    break;
+
+                case ObjectState.Stopped:
+                    _logCatcher.Warning($"{serviceName} downed. Attempting to restart.");
+
+                    if (settings.NumberOfRuns > 0)
+                    {
+                        appPool.Start();
+                        settings.NumberOfRuns--;
+
+                        if (appPool.State == ObjectState.Started)
+                            _logCatcher.Information($"{serviceName} started.");
+                        else
+                            _logCatcher.Error($"{serviceName} failed to run.");
+                    }
+                    else
+                        _logCatcher.Error($"{serviceName} downed. Maximum restart attempts exceeded.");
+                    break;
+
+                case ObjectState.Unknown:
+                    _logCatcher.Warning($"{serviceName} state is unknown.");
+                    break;
+
+                default:
+                    _logCatcher.Warning($"{serviceName} has an unexpected state.");
+                    break;
+            }
+        }
+
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Util
 {
-    public static class SettingsJsonHelper
+    public static class SettingsHelper
     {
         private static readonly ILogger _logger = SerilogHelper.GetLogger();
         private static readonly ISettingsRepository _settingsRepository = new JsonSettingsRepository(Constants.settingsFilePath);
