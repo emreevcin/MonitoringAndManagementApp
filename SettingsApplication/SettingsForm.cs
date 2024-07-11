@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows.Forms;
 using Util;
 using Util.AppConfigSettings;
+using Util.Generics;
 
 namespace SettingsApplication
 {
@@ -18,7 +19,7 @@ namespace SettingsApplication
 
             InitializeComponent();
 
-            comboBoxService.Items.AddRange(new object[] { "FileWatcherService", "LogoWebApi" });
+            comboBoxService.Items.AddRange(new object[] { Enum.GetName(typeof(ServiceNames), ServiceNames.FileWatcherService), Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi) });
             comboBoxService.SelectedIndex = 0;
 
             LoadSettings(comboBoxService.Text);
@@ -80,8 +81,9 @@ namespace SettingsApplication
 
         private void UpdateVisibility(string serviceName)
         {
-            bool isService = serviceName.Contains("Service");
-            bool isWebApi = serviceName.Contains("WebApi");
+            var serviceType = SettingsHelper.GetServiceType(serviceName);
+            bool isService = serviceType == ServiceTypes.Service;
+            bool isWebApi = serviceType == ServiceTypes.WebApi;
 
             labelFolderPath.Visible = isService;
             textBoxFolderPath.Visible = isService;
@@ -94,13 +96,13 @@ namespace SettingsApplication
         {
             SettingsHelper.CheckServiceNameAndLogError(settings);
 
-            string serviceName = settings.ServiceName;
+            var serviceType = SettingsHelper.GetServiceType(settings.ServiceName);
 
-            if (serviceName.Contains("Service"))
+            if (serviceType == ServiceTypes.Service)
             {
                 textBoxFolderPath.Text = settings.FolderPath?.ToString();
             }
-            else if (serviceName.Contains("WebApi"))
+            else if (serviceType == ServiceTypes.WebApi)
             {
                 textBoxUrl.Text = settings.Url?.ToString();
             }
@@ -198,11 +200,11 @@ namespace SettingsApplication
                 LogLevel = logLevel
             };
 
-            if (serviceName.Contains("Service"))
+            if (SettingsHelper.GetServiceType(serviceName) == ServiceTypes.Service)
             {
                 serviceSettings.FolderPath = textBoxFolderPath.Text;
             }
-            else if (serviceName.Contains("WebApi"))
+            else if (SettingsHelper.GetServiceType(serviceName) == ServiceTypes.WebApi)
             {
                 serviceSettings.Url = textBoxUrl.Text;
             }

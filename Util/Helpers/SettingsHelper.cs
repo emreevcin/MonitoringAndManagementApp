@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using Util.Generics;
 
 namespace Util
 {
@@ -31,7 +32,7 @@ namespace Util
                 var allSettings = _settingsRepository.LoadAllSettings();
                 if (allSettings != null)
                 {
-                    string categoryName = GetCategoryName(serviceKey);
+                    string categoryName = Enum.GetName(typeof(SettingsCategories), GetCategoryName(serviceKey));
                     if (allSettings.ContainsKey(categoryName) && allSettings[categoryName].ContainsKey(serviceKey))
                     {
                         return allSettings[categoryName][serviceKey];
@@ -80,9 +81,19 @@ namespace Util
             }
         }
 
+        public static ServiceTypes GetServiceType(string serviceName)
+        {
+            if (serviceName.Contains("Service"))
+                return ServiceTypes.Service;
+            if (serviceName.Contains("WebApi"))
+                return ServiceTypes.WebApi;
+
+            return ServiceTypes.Unknown;
+        }
+
         private static void UpdateServiceSettings(Dictionary<string, Dictionary<string, ServiceSettingsDto>> allSettings, string serviceKey, ServiceSettingsDto serviceSettings)
         {
-            string categoryName = GetCategoryName(serviceKey);
+            string categoryName = Enum.GetName(typeof(SettingsCategories), GetCategoryName(serviceKey));
             if (!allSettings.ContainsKey(categoryName))
             {
                 allSettings[categoryName] = new Dictionary<string, ServiceSettingsDto>();
@@ -90,9 +101,17 @@ namespace Util
             }
             allSettings[categoryName][serviceKey] = serviceSettings;
         }
-        internal static string GetCategoryName(string serviceName)
+        internal static SettingsCategories GetCategoryName(string serviceName)
         {
-            return serviceName.Contains("Service") ? "Services" : "WebApis";
+            switch (GetServiceType(serviceName))
+            {
+                case ServiceTypes.Service:
+                    return SettingsCategories.Services;
+                case ServiceTypes.WebApi:
+                    return SettingsCategories.WebApis;
+                default:
+                    return SettingsCategories.Unknown;
+            }
         }
 
     }

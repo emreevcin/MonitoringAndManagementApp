@@ -1,4 +1,5 @@
-﻿using System.ServiceProcess;
+﻿using System;
+using System.ServiceProcess;
 using Util;
 using Util.Generics;
 
@@ -7,7 +8,7 @@ namespace FileWatcherService
     internal static class Program
     {
 
-        private readonly static string _serviceName = "FileWatcherService";
+        private readonly static string _serviceName = Enum.GetName(typeof(ServiceNames), ServiceNames.FileWatcherService);
 
         /// <summary>
         /// The main entry point for the application.

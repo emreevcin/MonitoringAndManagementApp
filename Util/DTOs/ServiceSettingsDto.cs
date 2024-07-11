@@ -1,4 +1,5 @@
 ﻿using Serilog.Events;
+using Util.Generics;
 
 namespace Util
 {
@@ -10,8 +11,8 @@ namespace Util
             MonitorInterval = Constants.DefaultMonitorInterval;
             NumberOfRuns = Constants.DefaultNumberOfRuns;
             LogLevel = Constants.DefaultLogLevel;
-            Url = serviceName.Contains("WebApi") ? Constants.DefaultWebApiUrl : null;
-            FolderPath = serviceName.Contains("Service") ? $"{Constants.DefaultFolderPath}" : null;
+            Url = SettingsHelper.GetServiceType(serviceName) == ServiceTypes.WebApi ? Constants.DefaultWebApiUrl : null;
+            FolderPath = SettingsHelper.GetServiceType(serviceName) == ServiceTypes.Service ? $"{Constants.DefaultFolderPath}" : null;
         }
 
         public ServiceSettingsDto(string serviceName, int monitorInterval, int numberOfRuns, LogEventLevel logLevel, string url, string folderPath)

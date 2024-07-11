@@ -173,11 +173,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configs\AppConfigUpdater.cs" />
-    <Compile Include="Configs\IConfigUpdater.cs" />
     <Compile Include="Generics\Constants.cs" />
     <Compile Include="Generics\Enums.cs" />
     <Compile Include="Generics\LoggerUtil.cs" />
-    <Compile Include="Repositories\ISettingsRepository.cs" />
+    <Compile Include="Interfaces\ISettingsRepository.cs" />
     <Compile Include="Helpers\SettingsHelper.cs" />
     <Compile Include="Repositories\JsonSettingsRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

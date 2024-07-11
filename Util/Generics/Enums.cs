@@ -1,15 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Util.Generics
+﻿namespace Util.Generics
 {
+    public enum ServiceNames
+    {
+        FileWatcherService,
+        LogoWebApi
+    }
+
     public enum LoggerConfigurationType
     {
         WebApi,
         AppConfig,
         Util
+    }
+
+    public enum SettingsCategories
+    {
+        Unknown,
+        Services,
+        WebApis
+    }
+
+    public enum ServiceTypes
+    {
+        Unknown,
+        Service,
+        WebApi
     }
 }

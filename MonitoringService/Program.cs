@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceProcess;
 using Util;
 using Util.Generics;
@@ -18,8 +19,8 @@ namespace MonitoringService
             var logCatcher = LoggerUtil.ConfigureLogger(LoggerConfigurationType.AppConfig);
             var serviceMonitors = new Dictionary<string, IServiceMonitor>
             {
-                { "Services", new WindowsServiceMonitor(logCatcher) },
-                { "WebApis", new IISServiceMonitor(logCatcher) }
+                { Enum.GetName(typeof(SettingsCategories), SettingsCategories.Services), new WindowsServiceMonitor(logCatcher) },
+                { Enum.GetName(typeof(SettingsCategories), SettingsCategories.WebApis), new IISServiceMonitor(logCatcher) }
             };
                 
             ServicesToRun = new ServiceBase[]

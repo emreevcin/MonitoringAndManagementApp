@@ -5,7 +5,7 @@ using System;
 
 namespace Util.AppConfigSettings
 {
-    public class AppConfigUpdater : IConfigUpdater
+    public class AppConfigUpdater
     {
         public void UpdateAppConfigLogLevel(string serviceName, LogEventLevel logLevel, string appConfigPath)
         {

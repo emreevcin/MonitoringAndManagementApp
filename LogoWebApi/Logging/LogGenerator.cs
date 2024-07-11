@@ -8,7 +8,7 @@ namespace LogoWebApi.Logging
     {
         private static IConfiguration Configuration { get; set; }
 
-        private readonly static string _serviceName = "LogoWebApi";
+        private readonly static string _serviceName = Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi);
 
         public static void Initialize(IConfiguration configuration)
         {
