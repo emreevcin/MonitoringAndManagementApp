@@ -306,8 +306,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\ServiceHelpers.cs" />
     <Compile Include="Services\IISServiceMonitor.cs" />
-    <Compile Include="Services\IServiceMonitor.cs" />
+    <Compile Include="Interfaces\IServiceMonitor.cs" />
     <Compile Include="MonitoringService.cs">
       <SubType>Component</SubType>
     </Compile>

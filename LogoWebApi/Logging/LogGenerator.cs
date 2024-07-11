@@ -23,9 +23,7 @@ namespace LogoWebApi.Logging
             var logLevel = serviceSettings.LogLevel;
             var url = serviceSettings.Url;
 
-            var loggerConfig = LoggerUtil.ConfigureLogger(LoggerConfigurationType.WebApi, logLevel, Configuration);
-
-            Log.Logger = loggerConfig;
+            Log.Logger = LoggerUtil.ConfigureLogger(LoggerConfigurationType.WebApi, logLevel, Configuration);
 
             Log.Information($"Logger configured for {_serviceName} at {url} with log level {logLevel}");
         }
