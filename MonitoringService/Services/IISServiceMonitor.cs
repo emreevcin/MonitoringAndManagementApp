@@ -6,7 +6,7 @@ using MonitoringService.Helpers;
 
 namespace MonitoringService
 {
-    internal class IISServiceMonitor : IServiceMonitor
+    public class IISServiceMonitor : IServiceMonitor
     {
         private readonly ILogger _logCatcher;
 

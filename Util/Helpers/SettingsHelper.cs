@@ -30,21 +30,22 @@ namespace Util
             try
             {
                 var allSettings = _settingsRepository.LoadAllSettings();
-                if (allSettings != null)
+                if (allSettings == null)
                 {
-                    string categoryName = Enum.GetName(typeof(SettingsCategories), GetCategoryName(serviceKey));
-                    if (allSettings.ContainsKey(categoryName) && allSettings[categoryName].ContainsKey(serviceKey))
-                    {
-                        return allSettings[categoryName][serviceKey];
-                    }
-                    else
-                    {
-                        _logger.Warning($"Settings for {serviceKey} not found in category {categoryName}. Returning default settings.");
-                        return new ServiceSettingsDto(serviceKey);
-                    }
+                    _logger.Warning("All settings are null. No settings loaded.");
+                    return new ServiceSettingsDto(serviceKey); 
                 }
-                _logger.Warning("All settings are null. Returning default settings.");
-                return new ServiceSettingsDto(serviceKey);
+
+                string categoryName = Enum.GetName(typeof(SettingsCategories), GetCategoryName(serviceKey));
+                if (allSettings.ContainsKey(categoryName) && allSettings[categoryName].ContainsKey(serviceKey))
+                {
+                    return allSettings[categoryName][serviceKey];
+                }
+                else
+                {
+                    _logger.Warning($"Settings for {serviceKey} not found in category {categoryName}. Returning default settings.");
+                    return new ServiceSettingsDto(serviceKey);
+                }
             }
             catch (Exception ex)
             {
@@ -61,7 +62,7 @@ namespace Util
                 if (allSettings == null)
                 {
                     _logger.Warning("All settings are null. No settings loaded.");
-                    allSettings = new Dictionary<string, Dictionary<string, ServiceSettingsDto>>();
+                    return new Dictionary<string, Dictionary<string, ServiceSettingsDto>>();
                 }
                 return allSettings;
             }

@@ -48,7 +48,7 @@ namespace MonitoringService.Helpers
             }
         }
 
-        private static void TryRestartAppPool(ApplicationPool appPool, ServiceSettingsDto settings, ILogger _logCatcher)
+        public static void TryRestartAppPool(ApplicationPool appPool, ServiceSettingsDto settings, ILogger _logCatcher)
         {
             SettingsHelper.CheckServiceNameAndLogError(settings);
             string serviceName = settings.ServiceName;
@@ -121,7 +121,7 @@ namespace MonitoringService.Helpers
             }
         }
 
-        private static void TryRestartWindowsService(ServiceController service, ServiceSettingsDto settings, ILogger _logCatcher)
+        public static void TryRestartWindowsService(ServiceController service, ServiceSettingsDto settings, ILogger _logCatcher)
         {
             SettingsHelper.CheckServiceNameAndLogError(settings);
             string serviceName = settings.ServiceName;

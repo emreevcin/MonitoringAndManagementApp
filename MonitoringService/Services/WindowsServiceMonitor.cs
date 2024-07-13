@@ -6,7 +6,7 @@ using Util;
 
 namespace MonitoringService
 {
-    internal class WindowsServiceMonitor : IServiceMonitor
+    public class WindowsServiceMonitor : IServiceMonitor
     {
         private readonly ILogger _logCatcher;
 

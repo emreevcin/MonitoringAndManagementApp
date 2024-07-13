@@ -30,7 +30,7 @@ namespace MonitoringService
             _logCatcher.Information("Monitoring Service stopped.");
         }
 
-        private void StartMonitoring()
+        public void StartMonitoring()
         {
             try
             {

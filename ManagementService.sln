@@ -11,7 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileWatcherService", "FileW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "Util\Util.csproj", "{D7367177-AF14-4620-8F7E-780E2C1B5E6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogoWebApi", "LogoWebApi\LogoWebApi.csproj", "{90F809CF-3072-4816-B623-04ED7CBEA2A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogoWebApi", "LogoWebApi\LogoWebApi.csproj", "{90F809CF-3072-4816-B623-04ED7CBEA2A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaMApp.Test", "MaMApp.Test\MaMApp.Test.csproj", "{B0466575-D544-44FD-8F1C-A677B92B60F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{90F809CF-3072-4816-B623-04ED7CBEA2A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90F809CF-3072-4816-B623-04ED7CBEA2A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90F809CF-3072-4816-B623-04ED7CBEA2A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0466575-D544-44FD-8F1C-A677B92B60F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0466575-D544-44FD-8F1C-A677B92B60F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0466575-D544-44FD-8F1C-A677B92B60F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0466575-D544-44FD-8F1C-A677B92B60F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
