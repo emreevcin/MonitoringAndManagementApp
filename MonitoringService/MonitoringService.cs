@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.ServiceProcess;
 using System.Timers;
+using MonitoringService.Interfaces;
+using MonitoringService.Wrappers;
 using Serilog;
+using Serilog.Core;
 using Util;
 
 namespace MonitoringService
@@ -11,12 +14,16 @@ namespace MonitoringService
     {
         private readonly ILogger _logCatcher;
         private readonly Dictionary<string, IServiceMonitor> _serviceMonitors;
+        private readonly ISettingsHelper _settingsHelper;
+        private readonly IServiceController _serviceController;
 
-        public MonitoringService(ILogger logCatcher, Dictionary<string, IServiceMonitor> serviceMonitors)
+        public MonitoringService(ILogger logCatcher, Dictionary<string, IServiceMonitor> serviceMonitors, ISettingsHelper settingsHelper, IServiceController serviceController)
         {
             InitializeComponent();
-            _logCatcher = logCatcher;
-            _serviceMonitors = serviceMonitors;
+            _logCatcher = logCatcher ?? throw new ArgumentNullException(nameof(logCatcher));
+            _serviceMonitors = serviceMonitors ?? throw new ArgumentNullException(nameof(serviceMonitors));
+            _settingsHelper = settingsHelper ?? throw new ArgumentNullException(nameof(settingsHelper));
+            _serviceController = serviceController ?? throw new ArgumentNullException(nameof(serviceController));
         }
 
         protected override void OnStart(string[] args)
@@ -34,7 +41,7 @@ namespace MonitoringService
         {
             try
             {
-                var servicesToMonitor = SettingsHelper.LoadAllServiceSettings();
+                var servicesToMonitor = _settingsHelper.LoadAllServiceSettings();
                 foreach (var categoryEntry in servicesToMonitor)
                 {
                     string categoryName = categoryEntry.Key;

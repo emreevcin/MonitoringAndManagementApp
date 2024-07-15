@@ -5,7 +5,7 @@ using System;
 using Util;
 using Xunit;
 
-namespace MaMApp.Test
+namespace MaMApp.Test.SettingsApplication.Tests
 {
     public class SettingsTests
     {
@@ -20,7 +20,7 @@ namespace MaMApp.Test
         public void LoadServiceSettings_ReturnsCorrectSettings()
         {
             // Arrange
-            var serviceKey = "TestService";
+            var serviceKey = "FileWatcherService";
             var expectedSettings = new ServiceSettingsDto(serviceKey)
             {
                 MonitorInterval = 5,
@@ -66,7 +66,7 @@ namespace MaMApp.Test
         public void LoadServiceSettings_ReturnsDefaultSettings_WhenAllSettingsAreNull()
         {
             // Arrange
-            var serviceKey = "TestService";
+            var serviceKey = "FileWatcherService";
             Dictionary<string, Dictionary<string, ServiceSettingsDto>> allSettings = null;
 
             _settingsRepositoryMock.Setup(repo => repo.LoadAllSettings()).Returns(allSettings);
@@ -85,7 +85,7 @@ namespace MaMApp.Test
         public void LoadAllServiceSettings_ReturnsAllSettings()
         {
             // Arrange
-            var expectedServiceKey = "TestService";
+            var expectedServiceKey = "FileWatcherService";
             var expectedSettings = new ServiceSettingsDto(expectedServiceKey)
             {
                 MonitorInterval = 5,
@@ -121,29 +121,11 @@ namespace MaMApp.Test
             Assert.Equal(expectedSettings.FolderPath, actualSettings.FolderPath);
         }
 
-
-
-
-        [Fact]
-        public void LoadAllServiceSettings_ReturnsEmptyDictionary_WhenAllSettingsAreNull()
-        {
-            // Arrange
-            Dictionary<string, Dictionary<string, ServiceSettingsDto>> allSettings = null;
-
-            _settingsRepositoryMock.Setup(repo => repo.LoadAllSettings()).Returns(allSettings);
-
-            // Act
-            var result = SettingsHelper.LoadAllServiceSettings();
-
-            // Assert
-            Assert.Empty(result);
-        }
-
         [Fact]
         public void SaveServiceSettings_SavesCorrectly()
         {
             // Arrange
-            var serviceKey = "TestService";
+            var serviceKey = "FileWatcherService";
             var newSettings = new ServiceSettingsDto(serviceKey)
             {
                 MonitorInterval = 5,

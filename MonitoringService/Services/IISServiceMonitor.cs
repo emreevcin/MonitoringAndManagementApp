@@ -3,6 +3,7 @@ using Microsoft.Web.Administration;
 using System;
 using Util;
 using MonitoringService.Helpers;
+using MonitoringService.Wrappers;
 
 namespace MonitoringService
 {
@@ -25,9 +26,10 @@ namespace MonitoringService
             {
                 using (var serverManager = new ServerManager())
                 {
-                    ApplicationPool appPool = serverManager.ApplicationPools[serviceName];
+                    var appPool = serverManager.ApplicationPools[serviceName];
+                    var appPoolWrapper = new ApplicationPoolWrapper(appPool);
 
-                    ServiceHelpers.CheckAndRestartAppPool(appPool, settings, _logCatcher);
+                    ServiceHelpers.CheckAndRestartAppPool(appPoolWrapper, settings, _logCatcher);
                 }
             }
             catch (InvalidOperationException ex)

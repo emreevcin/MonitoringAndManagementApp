@@ -1,4 +1,6 @@
 ﻿using Microsoft.Web.Administration;
+using MonitoringService.Interfaces;
+using MonitoringService.Wrappers;
 using Serilog;
 using System;
 using System.ServiceProcess;
@@ -8,7 +10,7 @@ namespace MonitoringService.Helpers
 {
     public static class ServiceHelpers
     {
-        public static void CheckAndRestartAppPool(ApplicationPool appPool, ServiceSettingsDto settings, ILogger _logCatcher)
+        public static void CheckAndRestartAppPool(IApplicationPoolWrapper appPool, ServiceSettingsDto settings, ILogger _logCatcher)
         {
             SettingsHelper.CheckServiceNameAndLogError(settings);
             string serviceName = settings.ServiceName;
@@ -48,7 +50,7 @@ namespace MonitoringService.Helpers
             }
         }
 
-        public static void TryRestartAppPool(ApplicationPool appPool, ServiceSettingsDto settings, ILogger _logCatcher)
+        public static void TryRestartAppPool(IApplicationPoolWrapper appPool, ServiceSettingsDto settings, ILogger _logCatcher)
         {
             SettingsHelper.CheckServiceNameAndLogError(settings);
             string serviceName = settings.ServiceName;
@@ -79,12 +81,12 @@ namespace MonitoringService.Helpers
 
         }
 
-        public static void CheckAndRestartWindowsService(ServiceController service, ServiceSettingsDto settings, ServiceControllerStatus status, ILogger _logCatcher)
+        public static void CheckAndRestartWindowsService(IServiceController service, ServiceSettingsDto settings, ILogger _logCatcher)
         {
             SettingsHelper.CheckServiceNameAndLogError(settings);
             string serviceName = settings.ServiceName;
 
-            switch (status)
+            switch (service.Status)
             {
                 case ServiceControllerStatus.ContinuePending:
                     _logCatcher.Information($"{serviceName} continue pending.");
@@ -116,12 +118,12 @@ namespace MonitoringService.Helpers
                     break;
 
                 default:
-                    _logCatcher.Warning($"{serviceName} has an unexpected status: {status}");
+                    _logCatcher.Warning($"{serviceName} has an unexpected status: {service.Status}");
                     break;
             }
         }
 
-        public static void TryRestartWindowsService(ServiceController service, ServiceSettingsDto settings, ILogger _logCatcher)
+        public static void TryRestartWindowsService(IServiceController service, ServiceSettingsDto settings, ILogger _logCatcher)
         {
             SettingsHelper.CheckServiceNameAndLogError(settings);
             string serviceName = settings.ServiceName;

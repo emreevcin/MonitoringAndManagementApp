@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.ServiceProcess;
 using Serilog;
+using Serilog.Core;
 
 namespace FileWatcherService
 {
@@ -8,7 +11,7 @@ namespace FileWatcherService
     {
         private readonly ILogger _logCatcher;
         private readonly string _path;
-        private FileSystemWatcher _watcher;
+        public FileSystemWatcher _watcher;
 
         public FileWatcherService(ILogger logCatcher, string path)
         {
@@ -20,6 +23,12 @@ namespace FileWatcherService
         protected override void OnStart(string[] args)
         {
             _logCatcher.Information("Service started.");
+
+            if (!Directory.Exists(_path))
+            {
+                _logCatcher.Error($"Path {_path} does not exist.");
+                return;
+            }
 
             ConfigureFileSystemWatcher();
         }
@@ -53,14 +62,24 @@ namespace FileWatcherService
             _watcher.EnableRaisingEvents = true;
         }
 
-        private void OnFileSystemEvent(object sender, FileSystemEventArgs e)
+        public void OnFileSystemEvent(object sender, FileSystemEventArgs e)
         {
             _logCatcher.Information($"{e.ChangeType}: {e.Name}");
         }
 
-        private void OnRenamed(object sender, RenamedEventArgs e)
+        public void OnRenamed(object sender, RenamedEventArgs e)
         {
             _logCatcher.Information($"File: {e.OldFullPath} renamed to {e.FullPath}");
+        }
+
+        public void StartService(string[] args)
+        {
+            OnStart(args);
+        }
+
+        public void StopService()
+        {
+            OnStop();
         }
     }
 }

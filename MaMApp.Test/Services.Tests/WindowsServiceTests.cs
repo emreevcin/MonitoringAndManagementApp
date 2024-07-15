@@ -1,0 +1,71 @@
+﻿using MonitoringService;
+using Moq;
+using System;
+using System.ServiceProcess;
+using System.Threading.Tasks;
+using Serilog;
+using Xunit;
+using Microsoft.Extensions.DependencyInjection;
+using MonitoringService.Interfaces;
+using Util;
+
+namespace MaMApp.Test.Services.Tests
+{
+    public class WindowsServiceTests
+    {
+        private readonly Mock<ILogger> _mockLogger;
+        private readonly Mock<IServiceProvider> _mockServiceProvider;
+        private readonly Mock<IServiceController> _mockServiceControllerWrapper;
+        private readonly Mock<IServiceScopeFactory> _mockScopeFactory;
+        private readonly Mock<IServiceScope> _mockScope;
+
+        public WindowsServiceTests()
+        {
+            _mockLogger = new Mock<ILogger>();
+            _mockServiceProvider = new Mock<IServiceProvider>();
+            _mockServiceControllerWrapper = new Mock<IServiceController>();
+            _mockScopeFactory = new Mock<IServiceScopeFactory>();
+            _mockScope = new Mock<IServiceScope>();
+
+            _mockServiceProvider.Setup(sp => sp.GetService(typeof(IServiceScopeFactory)))
+                                .Returns(_mockScopeFactory.Object);
+
+            _mockScopeFactory.Setup(sf => sf.CreateScope())
+                             .Returns(_mockScope.Object);
+
+            _mockScope.Setup(s => s.ServiceProvider)
+                      .Returns(_mockServiceProvider.Object);
+
+            _mockServiceProvider.Setup(sp => sp.GetService(typeof(IServiceController)))
+                                .Returns(_mockServiceControllerWrapper.Object);
+        }
+
+        [Fact]
+        public void MonitorService_ShouldNotRestartService_WhenServiceIsRunning()
+        {
+            // Arrange
+            var settings = new ServiceSettingsDto
+            {
+                ServiceName = "FileWatcherService",
+                MonitorInterval = 5,
+                NumberOfRuns = 3,
+                LogLevel = Serilog.Events.LogEventLevel.Information,
+                Url = null,
+                FolderPath = ".\\"
+            };
+
+            _mockServiceControllerWrapper.SetupGet(sc => sc.Status).Returns(ServiceControllerStatus.Running);
+
+            var monitoringService = new WindowsServiceMonitor(_mockLogger.Object, _mockServiceProvider.Object);
+
+            // Act
+            monitoringService.MonitorService(settings);
+
+            Task.Delay(1000).Wait();
+
+            // Assert
+            _mockServiceControllerWrapper.Verify(sc => sc.Start(), Times.Never);
+            _mockLogger.Verify(l => l.Information($"{settings.ServiceName} is running."), Times.Once);
+        }
+    }
+}
