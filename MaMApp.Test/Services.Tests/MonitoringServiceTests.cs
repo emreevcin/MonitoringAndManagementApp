@@ -8,7 +8,6 @@ using System.Timers;
 using MonitoringService.Interfaces;
 using Util.Generics;
 
-
 namespace MaMApp.Test.Services.Tests
 {
     public class MonitoringServiceTests
@@ -58,8 +57,10 @@ namespace MaMApp.Test.Services.Tests
             System.Threading.Thread.Sleep(6000);
 
             // Assert
-            _mockServiceMonitor.Verify(m => m.MonitorService(It.IsAny<ServiceSettingsDto>()), Times.AtLeastOnce);
+            var monitorServiceCalls = _mockServiceMonitor.Invocations
+                .Count(inv => inv.Method.Name == nameof(_mockServiceMonitor.Object.MonitorService));
 
+            Assert.True(monitorServiceCalls > 0, "MonitorService should have been called at least once.");
         }
 
         [Fact]
@@ -69,9 +70,9 @@ namespace MaMApp.Test.Services.Tests
             var settings = SettingsHelper.LoadServiceSettings(Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi));
 
             var servicesToMonitor = new Dictionary<string, Dictionary<string, ServiceSettingsDto>>
-        {
-            { Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi), new Dictionary<string, ServiceSettingsDto> { { Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi), settings } } }
-        };
+            {
+                { Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi), new Dictionary<string, ServiceSettingsDto> { { Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi), settings } } }
+            };
 
             _mockSettingsHelper.Setup(s => s.LoadAllSettings()).Returns(servicesToMonitor);
 
@@ -83,7 +84,10 @@ namespace MaMApp.Test.Services.Tests
             System.Threading.Thread.Sleep(6000);
 
             // Assert
-            _mockServiceMonitor.Verify(m => m.MonitorService(It.IsAny<ServiceSettingsDto>()), Times.AtLeastOnce);
+            var monitorServiceCalls = _mockServiceMonitor.Invocations
+                .Count(inv => inv.Method.Name == nameof(_mockServiceMonitor.Object.MonitorService));
+
+            Assert.True(monitorServiceCalls > 0, "MonitorService should have been called at least once.");
         }
     }
 }

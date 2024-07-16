@@ -41,6 +41,10 @@ namespace MaMApp.Test.Services.Tests
 
             // Assert
             _mockLogger.Verify(l => l.Warning($"{_settings.ServiceName} downed. Attempting to restart."), Times.Once);
+            var warningLogs = _mockLogger.Invocations
+                                         .Count(inv => inv.Method.Name == nameof(_mockLogger.Object.Warning) &&
+                                                       inv.Arguments[0].ToString() == $"{_settings.ServiceName} downed. Attempting to restart.");
+            Assert.Equal(1, warningLogs);
         }
 
         [Fact]
@@ -57,8 +61,14 @@ namespace MaMApp.Test.Services.Tests
             ServiceHelpers.CheckAndRestartAppPool(_mockAppPool.Object, _settings, _mockLogger.Object);
 
             // Assert
-            _mockAppPool.Verify(ap => ap.Start(), Times.Once);
-            _mockLogger.Verify(l => l.Information($"{_settings.ServiceName} started."), Times.Once);
+            var startCalls = _mockAppPool.Invocations
+                                         .Count(inv => inv.Method.Name == nameof(_mockAppPool.Object.Start));
+            Assert.Equal(1, startCalls);
+
+            var infoLogs = _mockLogger.Invocations
+                                      .Count(inv => inv.Method.Name == nameof(_mockLogger.Object.Information) &&
+                                                    inv.Arguments[0].ToString() == $"{_settings.ServiceName} started.");
+            Assert.Equal(1, infoLogs);
         }
 
         [Fact]
@@ -72,8 +82,14 @@ namespace MaMApp.Test.Services.Tests
             ServiceHelpers.CheckAndRestartAppPool(_mockAppPool.Object, _settings, _mockLogger.Object);
 
             // Assert
-            _mockAppPool.Verify(ap => ap.Start(), Times.Never);
-            _mockLogger.Verify(l => l.Error($"{_settings.ServiceName} downed. Maximum restart attempts exceeded."), Times.Once);
+            var startCalls = _mockAppPool.Invocations
+                                         .Count(inv => inv.Method.Name == nameof(_mockAppPool.Object.Start));
+            Assert.Equal(0, startCalls);
+
+            var errorLogs = _mockLogger.Invocations
+                                       .Count(inv => inv.Method.Name == nameof(_mockLogger.Object.Error) &&
+                                                     inv.Arguments[0].ToString() == $"{_settings.ServiceName} downed. Maximum restart attempts exceeded.");
+            Assert.Equal(1, errorLogs);
         }
 
         [Fact]

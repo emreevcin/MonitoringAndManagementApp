@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using Moq;
 using Serilog;
 using Util;
+using Xunit;
 
 namespace MaMApp.Test.Services.Tests
 {
@@ -46,7 +44,11 @@ namespace MaMApp.Test.Services.Tests
             fileWatcherService.OnFileSystemEvent(null, eventArgs);
 
             // Assert
-            _mockLogger.Verify(l => l.Information($"{eventArgs.ChangeType}: {eventArgs.Name}"), Times.Once);
+            var logInformationInvocations = _mockLogger.Invocations
+                .Count(inv => inv.Method.Name == nameof(_mockLogger.Object.Information) &&
+                              inv.Arguments.Contains($"{eventArgs.ChangeType}: {eventArgs.Name}"));
+
+            Assert.Equal(1, logInformationInvocations);
         }
 
         [Fact]
@@ -60,7 +62,11 @@ namespace MaMApp.Test.Services.Tests
             fileWatcherService.StartService(null);
 
             // Assert
-            _mockLogger.Verify(l => l.Error($"Path {invalidPath} does not exist."), Times.Once);
+            var logErrorInvocations = _mockLogger.Invocations
+                .Count(inv => inv.Method.Name == nameof(_mockLogger.Object.Error) &&
+                              inv.Arguments.Contains($"Path {invalidPath} does not exist."));
+
+            Assert.Equal(1, logErrorInvocations);
         }
 
         [Fact]
@@ -74,7 +80,11 @@ namespace MaMApp.Test.Services.Tests
             fileWatcherService.StartService(null);
 
             // Assert
-            _mockLogger.Verify(l => l.Information("Service started."), Times.Once);
+            var logInformationInvocations = _mockLogger.Invocations
+                .Count(inv => inv.Method.Name == nameof(_mockLogger.Object.Information) &&
+                              inv.Arguments.Contains("Service started."));
+
+            Assert.Equal(1, logInformationInvocations);
         }
 
         [Fact]
@@ -88,7 +98,11 @@ namespace MaMApp.Test.Services.Tests
             fileWatcherService.StopService();
 
             // Assert
-            _mockLogger.Verify(l => l.Information("Service stopped."), Times.Once);
+            var logInformationInvocations = _mockLogger.Invocations
+                .Count(inv => inv.Method.Name == nameof(_mockLogger.Object.Information) &&
+                              inv.Arguments.Contains("Service stopped."));
+
+            Assert.Equal(1, logInformationInvocations);
         }
     }
 }

@@ -58,8 +58,15 @@ namespace MaMApp.Test.Services.Tests
             Task.Delay(1000).Wait();
 
             // Assert
-            _mockServiceControllerWrapper.Verify(sc => sc.Start(), Times.Never);
-            _mockLogger.Verify(l => l.Information($"{_settings.ServiceName} is running."), Times.Once);
+            var startInvocations = _mockServiceControllerWrapper.Invocations
+                .Count(inv => inv.Method.Name == nameof(_mockServiceControllerWrapper.Object.Start));
+
+            var logInformationInvocations = _mockLogger.Invocations
+                .Count(inv => inv.Method.Name == nameof(_mockLogger.Object.Information) &&
+                              inv.Arguments.Contains($"{_settings.ServiceName} is running."));
+
+            Assert.Equal(0, startInvocations);
+            Assert.Equal(1, logInformationInvocations);
         }
     }
 }

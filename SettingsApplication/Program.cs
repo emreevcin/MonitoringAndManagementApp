@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Diagnostics.CodeAnalysis;
 using Util;
 using Util.Generics;
 
 namespace SettingsApplication
 {
+    [ExcludeFromCodeCoverage]
     internal static class Program
     {
         /// <summary>
