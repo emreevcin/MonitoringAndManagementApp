@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.ServiceProcess;
 using Util;
 using Util.Generics;
 
 namespace FileWatcherService
 {
+    [ExcludeFromCodeCoverage]
     internal static class Program
     {
 

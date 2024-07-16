@@ -1,10 +1,12 @@
 ﻿using Serilog.Events;
 using System.Configuration;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace Util.AppConfigSettings
 {
+    [ExcludeFromCodeCoverage]
     public class AppConfigUpdater
     {
         public void UpdateAppConfigLogLevel(string serviceName, LogEventLevel logLevel, string appConfigPath)

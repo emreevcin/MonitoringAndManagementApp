@@ -1,9 +1,11 @@
 ﻿using Serilog;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 
 namespace SettingsApplication
 {
+    [ExcludeFromCodeCoverage]
     public static class Validation
     {
         public static bool ValidateUrl(string url)

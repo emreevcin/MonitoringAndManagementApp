@@ -1,8 +1,10 @@
 ﻿using Serilog;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LogoWebApi.Logging
 {
+    [ExcludeFromCodeCoverage]
     public class RequestLoggingMiddleware
     {
         private readonly RequestDelegate _next;

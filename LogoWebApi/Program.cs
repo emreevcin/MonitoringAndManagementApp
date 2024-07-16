@@ -1,4 +1,6 @@
 using LogoWebApi.Logging;
+using System.Diagnostics.CodeAnalysis;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +17,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "LogoWebApi", Version = "v1" });
-    //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    //c.IncludeXmlComments(xmlPath);
+c.SwaggerDoc("v1", new () { Title = "LogoWebApi", Version = "v1" });
+//var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+//var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+//c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
@@ -27,8 +29,8 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "LogoWebApi v1");
-    c.DocumentTitle = "LogoWebApi";
+c.SwaggerEndpoint("/swagger/v1/swagger.json", "LogoWebApi v1");
+c.DocumentTitle = "LogoWebApi";
 });
 
 
@@ -39,3 +41,9 @@ app.MapControllers();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.Run();
+
+[ExcludeFromCodeCoverage]
+public partial class Program
+{
+}
+

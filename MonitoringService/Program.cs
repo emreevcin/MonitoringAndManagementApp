@@ -6,9 +6,11 @@ using System.ServiceProcess;
 using Util;
 using Util.Generics;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MonitoringService
 {
+    [ExcludeFromCodeCoverage]
     internal static class Program
     {
         /// <summary>

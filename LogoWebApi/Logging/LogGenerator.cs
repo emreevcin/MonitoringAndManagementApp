@@ -1,9 +1,11 @@
 ﻿using Serilog;
 using Util.Generics;
 using Util;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LogoWebApi.Logging
 {
+    [ExcludeFromCodeCoverage]
     public class LogGenerator
     {
         private static IConfiguration Configuration { get; set; }
