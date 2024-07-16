@@ -11,5 +11,8 @@ namespace Util
         public const int DefaultNumberOfRuns = 3;
         public const string DefaultFolderPath = ".\\";
         public const string DefaultWebApiUrl = "http://localhost:121/swagger/index.html";
+        public const string validPath = ".\\";
+        public const string invalidPath = "C:\\InvalidPath";
+        public const string testFileName = "test.txt";
     }
 }

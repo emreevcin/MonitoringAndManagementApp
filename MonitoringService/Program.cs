@@ -27,7 +27,7 @@ namespace MonitoringService
                 { Enum.GetName(typeof(SettingsCategories), SettingsCategories.Services), new WindowsServiceMonitor(logCatcher, serviceProvider) },
                 { Enum.GetName(typeof(SettingsCategories), SettingsCategories.WebApis), new IISServiceMonitor(logCatcher) }
             };
-            var settingsHelper = new SettingsHelperWrapper();
+            var settingsHelper = new JsonSettingsRepository(Constants.settingsFilePath);
             var serviceController = new ServiceControllerWrapper(Enum.GetName(typeof(ServiceNames), ServiceNames.FileWatcherService));
                 
             ServicesToRun = new ServiceBase[]

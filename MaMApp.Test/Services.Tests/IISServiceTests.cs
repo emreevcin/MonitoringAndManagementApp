@@ -9,6 +9,7 @@ using Moq;
 using Serilog;
 using System;
 using Util;
+using Util.Generics;
 using Xunit;
 
 namespace MaMApp.Test.Services.Tests
@@ -26,15 +27,7 @@ namespace MaMApp.Test.Services.Tests
             _mockAppPool = new Mock<IApplicationPoolWrapper>();
             _iisServiceMonitor = new IISServiceMonitor(_mockLogger.Object);
 
-            _settings = new ServiceSettingsDto
-            {
-                ServiceName = "TestAppPool",
-                MonitorInterval = 5,
-                NumberOfRuns = 3,
-                LogLevel = Serilog.Events.LogEventLevel.Information,
-                Url = null,
-                FolderPath = ".\\"
-            };
+            _settings = SettingsHelper.LoadServiceSettings(Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi));
         }
 
         [Fact]
@@ -47,7 +40,7 @@ namespace MaMApp.Test.Services.Tests
             ServiceHelpers.CheckAndRestartAppPool(_mockAppPool.Object, _settings, _mockLogger.Object);
 
             // Assert
-            _mockLogger.Verify(l => l.Warning("TestAppPool downed. Attempting to restart."), Times.Once);
+            _mockLogger.Verify(l => l.Warning($"{_settings.ServiceName} downed. Attempting to restart."), Times.Once);
         }
 
         [Fact]
@@ -65,7 +58,7 @@ namespace MaMApp.Test.Services.Tests
 
             // Assert
             _mockAppPool.Verify(ap => ap.Start(), Times.Once);
-            _mockLogger.Verify(l => l.Information("TestAppPool started."), Times.Once);
+            _mockLogger.Verify(l => l.Information($"{_settings.ServiceName} started."), Times.Once);
         }
 
         [Fact]
@@ -80,7 +73,7 @@ namespace MaMApp.Test.Services.Tests
 
             // Assert
             _mockAppPool.Verify(ap => ap.Start(), Times.Never);
-            _mockLogger.Verify(l => l.Error("TestAppPool downed. Maximum restart attempts exceeded."), Times.Once);
+            _mockLogger.Verify(l => l.Error($"{_settings.ServiceName} downed. Maximum restart attempts exceeded."), Times.Once);
         }
 
         [Fact]

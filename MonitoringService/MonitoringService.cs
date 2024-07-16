@@ -14,10 +14,10 @@ namespace MonitoringService
     {
         private readonly ILogger _logCatcher;
         private readonly Dictionary<string, IServiceMonitor> _serviceMonitors;
-        private readonly ISettingsHelper _settingsHelper;
+        private readonly ISettingsRepository _settingsHelper;
         private readonly IServiceController _serviceController;
 
-        public MonitoringService(ILogger logCatcher, Dictionary<string, IServiceMonitor> serviceMonitors, ISettingsHelper settingsHelper, IServiceController serviceController)
+        public MonitoringService(ILogger logCatcher, Dictionary<string, IServiceMonitor> serviceMonitors, ISettingsRepository settingsHelper, IServiceController serviceController)
         {
             InitializeComponent();
             _logCatcher = logCatcher ?? throw new ArgumentNullException(nameof(logCatcher));
@@ -41,7 +41,7 @@ namespace MonitoringService
         {
             try
             {
-                var servicesToMonitor = _settingsHelper.LoadAllServiceSettings();
+                var servicesToMonitor = _settingsHelper.LoadAllSettings();
                 foreach (var categoryEntry in servicesToMonitor)
                 {
                     string categoryName = categoryEntry.Key;

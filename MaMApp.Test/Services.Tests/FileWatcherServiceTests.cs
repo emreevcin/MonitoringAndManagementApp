@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using Serilog;
+using Util;
 
 namespace MaMApp.Test.Services.Tests
 {
@@ -21,7 +23,7 @@ namespace MaMApp.Test.Services.Tests
         public void OnStart_ShouldConfigureFileSystemWatcher()
         {
             // Arrange
-            string testPath = @".\";
+            string testPath = Constants.validPath;
             var fileWatcherService = new FileWatcherService.FileWatcherService(_mockLogger.Object, testPath);
 
             // Act
@@ -36,9 +38,9 @@ namespace MaMApp.Test.Services.Tests
         public void OnFileSystemEvent_ShouldLogInformation()
         {
             // Arrange
-            string testPath = @".\";
+            string testPath = Constants.validPath;
             var fileWatcherService = new FileWatcherService.FileWatcherService(_mockLogger.Object, testPath);
-            var eventArgs = new FileSystemEventArgs(WatcherChangeTypes.Changed, testPath, "test.txt");
+            var eventArgs = new FileSystemEventArgs(WatcherChangeTypes.Changed, testPath, Constants.testFileName);
 
             // Act
             fileWatcherService.OnFileSystemEvent(null, eventArgs);
@@ -51,7 +53,7 @@ namespace MaMApp.Test.Services.Tests
         public void OnStart_ShouldLogError_WhenPathDoesNotExist()
         {
             // Arrange
-            string invalidPath = @"C:\InvalidPath";
+            string invalidPath = Constants.invalidPath;
             var fileWatcherService = new FileWatcherService.FileWatcherService(_mockLogger.Object, invalidPath);
 
             // Act
@@ -65,7 +67,7 @@ namespace MaMApp.Test.Services.Tests
         public void OnStart_ShouldLogInformation()
         {
             // Arrange
-            string validPath = @"C:\ValidPath";
+            string validPath = Constants.validPath;
             var fileWatcherService = new FileWatcherService.FileWatcherService(_mockLogger.Object, validPath);
 
             // Act
@@ -79,7 +81,7 @@ namespace MaMApp.Test.Services.Tests
         public void OnStop_ShouldLogInformation()
         {
             // Arrange
-            string validPath = @"C:\ValidPath";
+            string validPath = Constants.validPath;
             var fileWatcherService = new FileWatcherService.FileWatcherService(_mockLogger.Object, validPath);
 
             // Act

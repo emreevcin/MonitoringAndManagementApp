@@ -6,6 +6,7 @@ using Util;
 using MonitoringService;
 using System.Timers;
 using MonitoringService.Interfaces;
+using Util.Generics;
 
 
 namespace MaMApp.Test.Services.Tests
@@ -15,7 +16,7 @@ namespace MaMApp.Test.Services.Tests
         private readonly Mock<ILogger> _mockLogger;
         private readonly Mock<IServiceMonitor> _mockServiceMonitor;
         private readonly Dictionary<string, IServiceMonitor> _serviceMonitors;
-        private readonly Mock<ISettingsHelper> _mockSettingsHelper;
+        private readonly Mock<ISettingsRepository> _mockSettingsHelper;
         private readonly Mock<IServiceController> _mockServiceController;
         private readonly Mock<IServiceProvider> _mockServiceProvider;
 
@@ -23,12 +24,12 @@ namespace MaMApp.Test.Services.Tests
         {
             _mockLogger = new Mock<ILogger>();
             _mockServiceMonitor = new Mock<IServiceMonitor>();
-            _mockSettingsHelper = new Mock<ISettingsHelper>();
+            _mockSettingsHelper = new Mock<ISettingsRepository>();
             _mockServiceProvider = new Mock<IServiceProvider>();
             _serviceMonitors = new Dictionary<string, IServiceMonitor>
             {
-                { "FileWatcherService", _mockServiceMonitor.Object },
-                { "LogoWebApi", _mockServiceMonitor.Object }
+                { Enum.GetName(typeof(ServiceNames), ServiceNames.FileWatcherService), _mockServiceMonitor.Object },
+                { Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi), _mockServiceMonitor.Object }
             };
             _mockServiceController = new Mock<IServiceController>();
 
@@ -40,22 +41,14 @@ namespace MaMApp.Test.Services.Tests
         public void StartMonitoringService_ShouldInvokeMonitorService()
         {
             // Arrange
-            var settings = new ServiceSettingsDto
-            {
-                ServiceName = "FileWatcherService",
-                MonitorInterval = 5,
-                NumberOfRuns = 3,
-                LogLevel = (Serilog.Events.LogEventLevel)2,
-                Url = null,
-                FolderPath = ".\\"
-            };
+            var settings = SettingsHelper.LoadServiceSettings(Enum.GetName(typeof(ServiceNames), ServiceNames.FileWatcherService));
 
             var servicesToMonitor = new Dictionary<string, Dictionary<string, ServiceSettingsDto>>
             {
-                { "FileWatcherService", new Dictionary<string, ServiceSettingsDto> { { "FileWatcherService", settings } } }
+                { Enum.GetName(typeof(ServiceNames), ServiceNames.FileWatcherService), new Dictionary<string, ServiceSettingsDto> { { Enum.GetName(typeof(ServiceNames), ServiceNames.FileWatcherService), settings } } }
             };
 
-            _mockSettingsHelper.Setup(s => s.LoadAllServiceSettings()).Returns(servicesToMonitor);
+            _mockSettingsHelper.Setup(s => s.LoadAllSettings()).Returns(servicesToMonitor);
 
             var monitoringService = new MonitoringService.MonitoringService(_mockLogger.Object, _serviceMonitors, _mockSettingsHelper.Object, _mockServiceController.Object);
 
@@ -73,22 +66,14 @@ namespace MaMApp.Test.Services.Tests
         public void StartMonitoring_ShouldInvokeMonitorService_ForLogoWebApi()
         {
             // Arrange
-            var settings = new ServiceSettingsDto
-            {
-                ServiceName = "LogoWebApi",
-                MonitorInterval = 5,
-                NumberOfRuns = 3,
-                LogLevel = (Serilog.Events.LogEventLevel)2,
-                Url = "http://localhost:121/swagger/index.html",
-                FolderPath = null
-            };
+            var settings = SettingsHelper.LoadServiceSettings(Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi));
 
             var servicesToMonitor = new Dictionary<string, Dictionary<string, ServiceSettingsDto>>
         {
-            { "LogoWebApi", new Dictionary<string, ServiceSettingsDto> { { "LogoWebApi", settings } } }
+            { Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi), new Dictionary<string, ServiceSettingsDto> { { Enum.GetName(typeof(ServiceNames), ServiceNames.LogoWebApi), settings } } }
         };
 
-            _mockSettingsHelper.Setup(s => s.LoadAllServiceSettings()).Returns(servicesToMonitor);
+            _mockSettingsHelper.Setup(s => s.LoadAllSettings()).Returns(servicesToMonitor);
 
             var monitoringService = new MonitoringService.MonitoringService(_mockLogger.Object, _serviceMonitors, _mockSettingsHelper.Object, _mockServiceController.Object);
 

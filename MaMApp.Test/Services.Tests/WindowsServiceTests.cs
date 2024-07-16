@@ -8,6 +8,7 @@ using Xunit;
 using Microsoft.Extensions.DependencyInjection;
 using MonitoringService.Interfaces;
 using Util;
+using Util.Generics;
 
 namespace MaMApp.Test.Services.Tests
 {
@@ -18,6 +19,7 @@ namespace MaMApp.Test.Services.Tests
         private readonly Mock<IServiceController> _mockServiceControllerWrapper;
         private readonly Mock<IServiceScopeFactory> _mockScopeFactory;
         private readonly Mock<IServiceScope> _mockScope;
+        private readonly ServiceSettingsDto _settings;
 
         public WindowsServiceTests()
         {
@@ -38,34 +40,26 @@ namespace MaMApp.Test.Services.Tests
 
             _mockServiceProvider.Setup(sp => sp.GetService(typeof(IServiceController)))
                                 .Returns(_mockServiceControllerWrapper.Object);
+
+            _settings = SettingsHelper.LoadServiceSettings(Enum.GetName(typeof(ServiceNames), ServiceNames.FileWatcherService));
         }
 
         [Fact]
         public void MonitorService_ShouldNotRestartService_WhenServiceIsRunning()
         {
             // Arrange
-            var settings = new ServiceSettingsDto
-            {
-                ServiceName = "FileWatcherService",
-                MonitorInterval = 5,
-                NumberOfRuns = 3,
-                LogLevel = Serilog.Events.LogEventLevel.Information,
-                Url = null,
-                FolderPath = ".\\"
-            };
-
             _mockServiceControllerWrapper.SetupGet(sc => sc.Status).Returns(ServiceControllerStatus.Running);
 
             var monitoringService = new WindowsServiceMonitor(_mockLogger.Object, _mockServiceProvider.Object);
 
             // Act
-            monitoringService.MonitorService(settings);
+            monitoringService.MonitorService(_settings);
 
             Task.Delay(1000).Wait();
 
             // Assert
             _mockServiceControllerWrapper.Verify(sc => sc.Start(), Times.Never);
-            _mockLogger.Verify(l => l.Information($"{settings.ServiceName} is running."), Times.Once);
+            _mockLogger.Verify(l => l.Information($"{_settings.ServiceName} is running."), Times.Once);
         }
     }
 }
